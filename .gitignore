@@ -1,1 +1,7 @@
+.classpath
+.project
 /bin/
+/src/compilador/analysis
+/src/compilador/lexer
+/src/compilador/node
+/src/compilador/parser
