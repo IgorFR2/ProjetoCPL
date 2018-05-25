@@ -1,0 +1,126 @@
+
+//	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
+	
+
+
+//	Especificacoes gerais: 
+//	1) Id: _*,a*,A* // Proibido ' ',caract. especiais, palavras reservadas
+//	2) String em 'aspas simples'
+//	3) Comentarios em bloco aninhados e balanceados
+
+  
+Package compilador ; 
+     
+Helpers 
+    //	 	Digitos alfanumericos e composicoes 	 
+    letra = ['a'..'z'] ;
+    letracaps  = ['A'..'Z'];
+    digito = ['0' .. '9'] ; 
+    sp = ' ' ; 
+    char = letra | letracaps | digito;
+    cmt_lin = '//';
+    cmt_a = '/*';
+    cmt_f = '*/';
+    //all = [0 .. 0xFFFF]; 
+    //char_esp = [all - char];
+    ctab = 9;
+    cr = 13;
+    nl = 10;
+    
+    
+    
+Tokens 
+    // 		Operadores		
+    // Aritmeticos 
+    //
+	//    nao
+	//    e
+	//    ou
+	tab = ctab;
+	enter = nl;
+    soma = '+';
+	subtrair = '-';
+	mult = '*';
+	div = '/';
+	mod = '%';
+	pow = '**';
+	
+	// Logicos 
+	 
+	gt = '>';
+	lt = '<';
+	geq = '>=';
+	leq = '<=';
+	
+	// 		 Divisores 		
+	par_e = '(';
+	par_d = ')';
+	col_e = '[';
+	col_d = ']';
+	chave_d = '{';
+	chave_e = '}';
+	semi = ';';
+	col = ':';
+    virg = ',';
+    under = '_';
+    igual = '=';
+    
+    
+    //					 Palavras reservadas 				
+    // criar definição de estados usados abaixo (  {normal} e {comentario} 
+	//     caracter
+	//     inteiro
+	//     real
+	//     inicio
+	//     fim
+	//     se
+	//     senao
+	//     enquanto
+	//     para
+	//     avalie <= o switch
+	//     caso <= o case
+	//     verdadeiro
+	//     falso
+      
+     
+    inteiro = digito; 
+    //real = digito virg digito;
+    //vetor = tipo col id col_e tamanho col_d semi <= type:id[tam];
+    
+    //{normal->comentario, comentario} 
+    
+    //Aplicar pilha
+    //{normal->comentario, comentario} 
+    //{comentario->normal, normal}
+	comentario_linear = cmt_lin;
+	comentario_mult_abrir = cmt_a; 
+    comentario_mult_fechar = cmt_f;
+    
+    
+Productions 
+    // Producoes matematicas  
+    program = [left]:inteiro soma [right]:inteiro semi;
+    //sub = [left]:inteiro subtrair [right]:inteiro semi;
+    //pot = [left]:inteiro pow [right]:inteiro semi;
+    
+    // Producoes logicas 
+    //
+	//    Regras: 
+	//    1) gt,lt,geq,leq, somente exp. logicas
+	//    2) X  a = b  =  c
+	//       O (a = b) = (c = d)
+    
+    
+    // Producoes de dados 
+    //
+    //	"3 - Nao existem vetores com mais de uma dimensao (e se perguntar o que
+	//	significa isso perde meio ponto)."
+	//	String e um vetor de caracter que nao pode ter quebra de linha (\t)	
+    //	vetores = tipo col id [ tam ] <= tam[0:n-1]
+    
+    //	Producoes de comentarios 
+    // Atribuicao
+	//	attr = col igual sp*;
+	
+	
+    
