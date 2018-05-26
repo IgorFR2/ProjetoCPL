@@ -1,6 +1,16 @@
 
 //	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
-	
+/* Falta: 
+*	 : Fim de linha e Enter
+1.1.4: ID - Não podemos usar palavras reservadas (tokens)
+1.2.*: Comentários em geral
+1.3.*: Criar strings (1.4.*) 
+1.4.*: Vetores <= criar conjunto de tipos (palavras reservadas: 1.1.4)
+1.5.*: Formatação de expressões lógicas
+1.6.3,4,6: Booleanos "e, ou, nao", prescedência de parenteses..chaves
+1.7.1: Verificar as palavras reservadas
+
+*/
 
 
 //	Especificacoes gerais: 
@@ -13,11 +23,12 @@ Package compilador ;
      
 Helpers 
     //	 	Digitos alfanumericos e composicoes 	 
-    letra 		= ['a'..'z'] ;
+    letramin	= ['a'..'z'] ;
     letracaps 	= ['A'..'Z'];
+    letra 		= [letramin + letracaps];
     digito 		= ['0' .. '9'] ; 
     sp 			= ' '; 
-    char 		= [letra + [letracaps + digito]];
+    char 		= [letra + digito];
     cmt_lin 	= '//';
     cmt_a 		= '/*';
     cmt_f 		= '*/';
@@ -59,7 +70,7 @@ Tokens
 	chave_esquerdo		= '}';
 	ponto_virgula		= ';';
 	dois_pontos			= ':';
-    virgula				= ',';
+    //virgula			= ',';
     underline			= '_';
     atribuir			= ':=';
 	tab					= ctab;
@@ -70,20 +81,22 @@ Tokens
     
     //					 Palavras reservadas 				
     // criar definição de estados usados abaixo (  {normal} e {comentario} 
-	caracter = '''char''';
+	caracter = '''todos''';
+    real 	= digito* ',' digito*;
     inteiro = digito*; 
-    //real 	= [[digito*] + [',' + [digito*]]];
 	//inicio = 'inicio';
 	//fim = 'fim';
 	//se = "se"; 
-	//     senao
-	//     enquanto
-	//     para
-	//     avalie <= o switch
-	//     caso <= o case
-	//     verdadeiro
-	//     falso
-      
+	//senao = "senao";
+	//enquanto = "enquanto";
+	//para = "para";
+	//avalie ="avalie";<= o switch
+	//caso = "caso"; <= o case
+	//verdadeiro = 1 | 'verdade';
+	//falso
+	id = ('_'|letra)(char|'_')*;
+	
+    
      
     //vetor = tipo col id col_e tamanho col_d semi <= type:id[tam];
     
@@ -96,6 +109,8 @@ Tokens
 	comentario_mult_abrir = cmt_a; 
     comentario_mult_fechar = cmt_f;
     
+//Ignored Tokens
+	//espaco;  
     
 Productions 
     // Producoes matematicas  
