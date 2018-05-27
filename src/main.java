@@ -22,6 +22,12 @@ public class main {
             			System.out.print(" "); break;
             		case "TTab":
             			System.out.print("\t");conta_tabs++; break;
+            		case "TComentarioFimErro":
+            			System.out.print("Erro de comentario de bloco. Linha: "
+            		                     + lexer.peek().getLine() + ", posicao:"
+            					         + lexer.peek().getPos() + ". :"
+            		                     + lexer.peek().getClass().getSimpleName());
+            			break;
             		default:
             			System.out.print(lexer.peek().getClass().getSimpleName()+' ');
             	}

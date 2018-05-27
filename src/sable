@@ -52,8 +52,6 @@ Tokens
     // Aritmeticos 
     soma 	= '+';
 	subtrair= '-';
-	mult	= '*';
-	div 	= '/';
 	mod 	= '%';
 	pow 	= '**';
 	
@@ -125,6 +123,7 @@ Tokens
 	{comentario} comentario_corpo = [todos -['*' + '/']]*;
 	{comentario} estrela = '*';
 	{comentario} barra = '/';
+	{normal} comentario_fim_erro = '*/';
     
 //Ignored Tokens
 	//espaco;  
