@@ -1,17 +1,15 @@
 
 //	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
 /* Falta: 
-*	 : Fim de linha e Enter
-1.1.4: ID - Não podemos usar palavras reservadas (tokens)
+[OK]	 : Fim de linha e Enter
+[OK] 1.1.4: ID - Não podemos usar palavras reservadas (tokens) -> palavras reservadas são tokens?( ex: verdadeiro, se, nao, entao...)
 1.2.*: Comentários em geral
-1.3.*: Criar strings (1.4.*) 
-1.4.*: Vetores <= criar conjunto de tipos (palavras reservadas: 1.1.4)
+[OK] 1.3.*: Criar strings (1.4.*) 
+[OK] 1.4.*: Vetores <= criar conjunto de tipos (palavras reservadas: 1.1.4)
 1.5.*: Formatação de expressões lógicas
-1.6.3,4,6: Booleanos "e, ou, nao", prescedência de parenteses..chaves
-1.7.1: Verificar as palavras reservadas
-
+1.6.3,4,6: Booleanos "e, ou, nao", prescedência de parenteses..chaves <= Não é Sintatico? (produções)
+[OK?]1.7.1: Verificar as palavras reservadas	
 */
-
 
 //	Especificacoes gerais: 
 //	1) Id: _*,a*,A* // Proibido ' ',caract. especiais, palavras reservadas
@@ -37,10 +35,16 @@ Helpers
     ctab 		= 9;
     cr 			= 13;
     nl 			= 10;
-    
+    tipo_string	= 'caractere';
+    tipos_dados	= tipo_string|'real'|'inteiro'|'booleano'; 
+    word		= tipos_dados|'inicio'|'fim'|'se'|'senão'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
+    bool_true	= 'verdadeiro';
+    bool_false	= 'falso';
+    int = 'inteiro';
+    float = 'real';
     
 Tokens 
-    // 		Operadores		
+    // 		Operadores	
     // Aritmeticos 
     soma 	= '+';
 	subtrair= '-';
@@ -60,8 +64,7 @@ Tokens
 	ou			= '|';
 	igualdade	= '==';
     
-	// 		 Divisores 
-	    
+	// 		 Divisores 	    
 	parenteses_esquerdo	= '(';
 	parenteses_direito	= ')';
 	colchete_esquerdo	= '[';
@@ -70,35 +73,38 @@ Tokens
 	chave_esquerdo		= '}';
 	ponto_virgula		= ';';
 	dois_pontos			= ':';
-    //virgula			= ',';
+    virgula			= ',';
     underline			= '_';
     atribuir			= ':=';
 	tab					= ctab;
-	enter				= 10;
+	enter				= cr | nl | cr nl;
 	espaco 				= ' ';
 	igual				= '=';
     
     
     //					 Palavras reservadas 				
     // criar definição de estados usados abaixo (  {normal} e {comentario} 
-	caracter = '''todos''';
-    real 	= digito* ',' digito*;
-    inteiro = digito*; 
-	//inicio = 'inicio';
-	//fim = 'fim';
-	//se = "se"; 
-	//senao = "senao";
-	//enquanto = "enquanto";
-	//para = "para";
-	//avalie ="avalie";<= o switch
-	//caso = "caso"; <= o case
-	//verdadeiro = 1 | 'verdade';
-	//falso
-	id = ('_'|letra)(char|'_')*;
+    reservada 	= word;
+	caracter 	= '''todos''';
+    real 		= digito digito* ',' digito digito*;
+    inteiro 	= digito*; 
+	inicio 	= 'inicio';
+	fim 		= 'fim.';
+	//se 		= "se"; 
+	//senao		= "senao";
+	//enquanto 	= "enquanto";
+	//para 		= "para";
+	//avalie 	="avalie";<= o switch
+	//caso 		= "caso"; <= o case
+	verdadeiro 	= bool_true;
+	falso 		= bool_false;
+	id 			= ('_'|letra)(char|'_')*;
 	
     
      
     //vetor = tipo col id col_e tamanho col_d semi <= type:id[tam];
+    vetor 	= tipos_dados':'sp?('_'|letra)(char|'_')*'['digito*'];';
+    string 	= tipo_string':'sp?( '_'|letra)(char|'_')*'['digito*'];' | '''([todos-'''])*''';
     
     //{normal->comentario, comentario} 
     
