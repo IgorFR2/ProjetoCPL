@@ -15,7 +15,14 @@ public class main {
                new FileReader(args[0]), 1024)); 
             
             while (!lexer.peek().getClass().getSimpleName().equals("EOF")){
-            	System.out.print(lexer.peek().getClass().getSimpleName());
+            	switch(lexer.peek().getClass().getSimpleName()){
+            		case "TEspaco":
+            			System.out.print(" "); break;
+            		case "TTab":
+            			System.out.print("\t"); break;
+            		default:
+            			System.out.print(lexer.peek().getClass().getSimpleName());
+            	}
             	System.out.print(" ");
             	lexer.next();
             	

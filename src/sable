@@ -1,6 +1,16 @@
 
 //	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
-	
+/* Falta: 
+*	 : Fim de linha e Enter
+1.1.4: ID - Não podemos usar palavras reservadas (tokens)
+1.2.*: Comentários em geral
+1.3.*: Criar strings (1.4.*) 
+1.4.*: Vetores <= criar conjunto de tipos (palavras reservadas: 1.1.4)
+1.5.*: Formatação de expressões lógicas
+1.6.3,4,6: Booleanos "e, ou, nao", prescedência de parenteses..chaves
+1.7.1: Verificar as palavras reservadas
+
+*/
 
 
 //	Especificacoes gerais: 
@@ -13,78 +23,81 @@ Package compilador ;
      
 Helpers 
     //	 	Digitos alfanumericos e composicoes 	 
-    letra = ['a'..'z'] ;
-    letracaps  = ['A'..'Z'];
-    digito = ['0' .. '9'] ; 
-    sp = ' ' ; 
-    char = letra | letracaps | digito;
-    cmt_lin = '//';
-    cmt_a = '/*';
-    cmt_f = '*/';
-    //all = [0 .. 0xFFFF]; 
-    //char_esp = [all - char];
-    ctab = 9;
-    cr = 13;
-    nl = 10;
-    
+    letramin	= ['a'..'z'] ;
+    letracaps 	= ['A'..'Z'];
+    letra 		= [letramin + letracaps];
+    digito 		= ['0' .. '9'] ; 
+    sp 			= ' '; 
+    char 		= [letra + digito];
+    cmt_lin 	= '//';
+    cmt_a 		= '/*';
+    cmt_f 		= '*/';
+    todos 		= [0 .. 0xFFFF]; 
+    char_esp	= [todos - char];
+    ctab 		= 9;
+    cr 			= 13;
+    nl 			= 10;
     
     
 Tokens 
     // 		Operadores		
     // Aritmeticos 
-    //
-	//    nao
-	//    e
-	//    ou
-	tab = ctab;
-	enter = nl;
-    soma = '+';
-	subtrair = '-';
-	mult = '*';
-	div = '/';
-	mod = '%';
-	pow = '**';
+    soma 	= '+';
+	subtrair= '-';
+	mult	= '*';
+	div 	= '/';
+	mod 	= '%';
+	pow 	= '**';
+	
 	
 	// Logicos 
-	 
-	gt = '>';
-	lt = '<';
-	geq = '>=';
-	leq = '<=';
-	
-	// 		 Divisores 		
-	par_e = '(';
-	par_d = ')';
-	col_e = '[';
-	col_d = ']';
-	chave_d = '{';
-	chave_e = '}';
-	semi = ';';
-	col = ':';
-    virg = ',';
-    under = '_';
-    igual = '=';
+	maior		= '>';
+	menor 		= '<';
+	maior_igual = '>=';
+	menor_igual = '<=';
+	nao			= '!';
+	e			= '&';
+	ou			= '|';
+	igualdade	= '==';
+    
+	// 		 Divisores 
+	    
+	parenteses_esquerdo	= '(';
+	parenteses_direito	= ')';
+	colchete_esquerdo	= '[';
+	colchete_direito	= ']';
+	chave_direita		= '{';
+	chave_esquerdo		= '}';
+	ponto_virgula		= ';';
+	dois_pontos			= ':';
+    //virgula			= ',';
+    underline			= '_';
+    atribuir			= ':=';
+	tab					= ctab;
+	enter				= 10;
+	espaco 				= ' ';
+	igual				= '=';
     
     
     //					 Palavras reservadas 				
     // criar definição de estados usados abaixo (  {normal} e {comentario} 
-	//     caracter
-	//     inteiro
-	//     real
-	//     inicio
-	//     fim
-	//     se
-	//     senao
-	//     enquanto
-	//     para
-	//     avalie <= o switch
-	//     caso <= o case
-	//     verdadeiro
-	//     falso
-      
+	caracter = '''todos''';
+    real 	= digito* ',' digito*;
+    inteiro = digito*; 
+	//inicio = 'inicio';
+	//fim = 'fim';
+	//se = "se"; 
+	//senao = "senao";
+	//enquanto = "enquanto";
+	//para = "para";
+	//avalie ="avalie";<= o switch
+	//caso = "caso"; <= o case
+	//verdadeiro = 1 | 'verdade';
+	//falso
+	id = ('_'|letra)(char|'_')*;
+	
+    
      
-    inteiro = digito; 
-    //real = digito virg digito;
     //vetor = tipo col id col_e tamanho col_d semi <= type:id[tam];
     
     //{normal->comentario, comentario} 
@@ -96,12 +109,14 @@ Tokens
 	comentario_mult_abrir = cmt_a; 
     comentario_mult_fechar = cmt_f;
     
+//Ignored Tokens
+	//espaco;  
     
 Productions 
     // Producoes matematicas  
-    program = [left]:inteiro soma [right]:inteiro semi;
-    //sub = [left]:inteiro subtrair [right]:inteiro semi;
-    //pot = [left]:inteiro pow [right]:inteiro semi;
+    program = [left]:inteiro soma [right]:inteiro ponto_virgula;
+    //sub 	= [left]:inteiro subtrair [right]:inteiro ponto_virgula;
+    //pot 	= [left]:inteiro pow [right]:inteiro ponto_virgula;
     
     // Producoes logicas 
     //
