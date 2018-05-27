@@ -2,12 +2,12 @@
 //	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
 /* Falta: 
 [OK]	 : Fim de linha e Enter
-[OK] 1.1.4: ID - Não podemos usar palavras reservadas (tokens) -> palavras reservadas são tokens?( ex: verdadeiro, se, nao, entao...)
-1.2.*: Comentários em geral
+[OK] 1.1.4: ID - Nï¿½o podemos usar palavras reservadas (tokens) -> palavras reservadas sï¿½o tokens?( ex: verdadeiro, se, nao, entao...)
+1.2.*: Comentï¿½rios em geral
 [OK] 1.3.*: Criar strings (1.4.*) 
 [OK] 1.4.*: Vetores <= criar conjunto de tipos (palavras reservadas: 1.1.4)
-1.5.*: Formatação de expressões lógicas
-1.6.3,4,6: Booleanos "e, ou, nao", prescedência de parenteses..chaves <= Não é Sintatico? (produções)
+1.5.*: Formataï¿½ï¿½o de expressï¿½es lï¿½gicas
+1.6.3,4,6: Booleanos "e, ou, nao", prescedï¿½ncia de parenteses..chaves <= Nï¿½o ï¿½ Sintatico? (produï¿½ï¿½es)
 [OK?]1.7.1: Verificar as palavras reservadas	
 */
 
@@ -37,11 +37,15 @@ Helpers
     nl 			= 10;
     tipo_string	= 'caractere';
     tipos_dados	= tipo_string|'real'|'inteiro'|'booleano'; 
-    word		= tipos_dados|'inicio'|'fim'|'se'|'senão'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
+    word		= tipos_dados|'inicio'|'fim'|'se'|'senï¿½o'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
     bool_true	= 'verdadeiro';
     bool_false	= 'falso';
     int = 'inteiro';
     float = 'real';
+
+States
+    normal,
+    comentario;
     
 Tokens 
     // 		Operadores	
@@ -83,7 +87,7 @@ Tokens
     
     
     //					 Palavras reservadas 				
-    // criar definição de estados usados abaixo (  {normal} e {comentario} 
+    // criar definiï¿½ï¿½o de estados usados abaixo (  {normal} e {comentario} 
     reservada 	= word;
 	caracter 	= '''todos''';
     real 		= digito digito* ',' digito digito*;
@@ -112,8 +116,15 @@ Tokens
     //{normal->comentario, comentario} 
     //{comentario->normal, normal}
 	comentario_linear = cmt_lin;
-	comentario_mult_abrir = cmt_a; 
-    comentario_mult_fechar = cmt_f;
+	//comentario_mult_abrir = cmt_a; 
+    //comentario_mult_fechar = cmt_f;
+    
+    {normal->comentario, comentario}
+          comentario = '/*';
+	{comentario} comentario_fim = '*/';
+	{comentario} comentario_corpo = [todos -['*' + '/']]*;
+	{comentario} estrela = '*';
+	{comentario} barra = '/';
     
 //Ignored Tokens
 	//espaco;  
