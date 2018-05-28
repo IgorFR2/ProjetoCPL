@@ -11,7 +11,7 @@ public class main {
       if (args.length > 0) { 
          try { 
             /* Form our AST */ 
-            Lexer lexer = new Lexer (new PushbackReader( 
+        	comentarioAninhado lexer = new comentarioAninhado (new PushbackReader( 
                new FileReader(args[0]), 1024)); 
             int conta_tabs=0;
             while (!lexer.peek().getClass().getSimpleName().equals("EOF")){
