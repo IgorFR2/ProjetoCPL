@@ -1,5 +1,5 @@
 //	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
-/* Falta: 
+/* Falta alguma coisa do LEXICO? (itens da parte 1 do documento que não foram aplicados/totalmente)
 Regras para identificadores:
 4 - Não podemos usar palavras reservadas (ex: inteiro: inteiro;)
 Regras para comentários:
@@ -18,11 +18,6 @@ Operadores:
 parênteses.
 6 - Comandos são terminados com ; (ponto e vírgula).
 
-Duvidas
-- Devemos criar um token vetor para cada tipo? Inteiro, String, Real
-- Parte lógica booleana
-- A parte de prescendência de () [] {}, por exemplo.
-
 */
 
 //	Especificacoes gerais: 
@@ -40,15 +35,17 @@ Helpers
     letra 		= [letramin + letracaps];
     digito 		= ['0' .. '9'] ; 
     sp 			= ' '; 
+   	ctab 		= 9;
+    cr 			= 13;
+    nl 			= 10;
+    nline		= cr | nl | cr nl;
     char 		= [letra + digito];
     cmt_lin 	= '//';
     cmt_a 		= '/*';
     cmt_f 		= '*/';
     todos 		= [0 .. 0xFFFF]; 
-    char_esp	= [todos - char];
-    ctab 		= 9;
-    cr 			= 13;
-    nl 			= 10;
+    char_esp	= [[[0x20..0xFFFF]-letra]-digito];
+    
     tipo_string	= 'caractere';
     tipos_dados	= tipo_string|'real'|'inteiro'|'booleano'; 
     word		= tipos_dados|'inicio'|'fim'|'se'|'senao'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
@@ -76,9 +73,10 @@ Tokens
 	maior_igual = '>=';
 	menor_igual = '<=';
 	nao			= '!';
-	e			= '&';
+	e			= 'e';
 	ou			= '|';
-	igualdade	= '==';
+	//igualdade	= '==';
+	diferente	= '<>';
     
 	// 		 Divisores 	    
 	parenteses_esquerdo	= '(';
@@ -107,17 +105,20 @@ Tokens
 	inteiro		= 'inteiro';
     num_real 	= digito digito* ',' digito digito*;
     num_inteiro = digito*; 
-	//se 		= "se"; 
-	//senao		= "senao";
-	//enquanto 	= "enquanto";
-	//para 		= "para";
-	//avalie 	= "avalie";<= o switch
-	//caso 		= "caso"; <= o case
+	se	 		= 'se'; 
+	senao		= 'senao';
+	enquanto 	= 'enquanto';
+	para 		= 'para';
+	avalie	 	= 'avalie';	//<= o switch
+	caso 		= 'caso';	// <= o case
 	verdadeiro 	= bool_true;
 	falso 		= bool_false;
+	escreva		= 'escreva';
+	leia		= 'leia';
 	id 			= ('_'|letra)(char|'_')*;	
 	string		= 'caractere';
 	caracter 	= '''todos''';
+	
 	
     //vetor 			= tipo col id col_e tamanho col_d semi <= type:id[tam];
     vetor 				= tipos_dados':'sp? nome'['digito*'];';
