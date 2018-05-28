@@ -1,14 +1,23 @@
-
 //	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
-/* Falta: 
-[OK]	 : Fim de linha e Enter
-[OK] 1.1.4: ID - N�o podemos usar palavras reservadas (tokens) -> palavras reservadas s�o tokens?( ex: verdadeiro, se, nao, entao...)
-1.2.*: Coment�rios em geral
-[OK] 1.3.*: Criar strings (1.4.*) 
-[OK] 1.4.*: Vetores <= criar conjunto de tipos (palavras reservadas: 1.1.4)
-1.5.*: Formata��o de express�es l�gicas
-1.6.3,4,6: Booleanos "e, ou, nao", presced�ncia de parenteses..chaves <= N�o � Sintatico? (produ��es)
-[OK?]1.7.1: Verificar as palavras reservadas	
+/* Falta alguma coisa do LEXICO? (itens da parte 1 do documento que não foram aplicados/totalmente)
+Regras para identificadores:
+4 - Não podemos usar palavras reservadas (ex: inteiro: inteiro;)
+Regras para comentários:
+3 - Os comentários de bloco devem ser aninhados e balanceados.
+Regras para vetores:
+2 - Os índices dos vetores vão de 0 a tam-1 (isso também vale para strings).
+Regras para expressões lógicas:
+1 - Os operadores >, <, >= e <= não podem ser usados com operandos que sejam
+expressões lógicas.
+2 – Os operadores = e <> não podem ser usados em cadeia. Ex.: a = b = c
+3 – Uma cadeia com os operadores = e <> pode ser obtida através do uso de
+parênteses. Ex.: (a = b) = (c = d)
+Operadores:
+3 - Operadores booleanos: 'nao', 'e' e 'ou'.
+4 - A prioridade dos operadores é igual à de C, e pode ser alterada com o uso de
+parênteses.
+6 - Comandos são terminados com ; (ponto e vírgula).
+
 */
 
 //	Especificacoes gerais: 
@@ -26,23 +35,25 @@ Helpers
     letra 		= [letramin + letracaps];
     digito 		= ['0' .. '9'] ; 
     sp 			= ' '; 
+   	ctab 		= 9;
+    cr 			= 13;
+    nl 			= 10;
+    nline		= cr | nl | cr nl;
     char 		= [letra + digito];
     cmt_lin 	= '//';
     cmt_a 		= '/*';
     cmt_f 		= '*/';
     todos 		= [0 .. 0xFFFF]; 
-    char_esp	= [todos - char];
-    ctab 		= 9;
-    cr 			= 13;
-    nl 			= 10;
+    char_esp	= [[[0x20..0xFFFF]-letra]-digito];
+    
     tipo_string	= 'caractere';
     tipos_dados	= tipo_string|'real'|'inteiro'|'booleano'; 
-    word		= tipos_dados|'inicio'|'fim'|'se'|'sen�o'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
+    word		= tipos_dados|'inicio'|'fim'|'se'|'senao'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
     bool_true	= 'verdadeiro';
     bool_false	= 'falso';
-    int = 'inteiro';
-    float = 'real';
-
+    tprograma 	= 'programa';
+    tinicio		= 'inicio';
+    nome		= ('_'|letra)(char|'_')*;
 States
     normal,
     comentario;
@@ -62,9 +73,10 @@ Tokens
 	maior_igual = '>=';
 	menor_igual = '<=';
 	nao			= '!';
-	e			= '&';
+	e			= 'e';
 	ou			= '|';
-	igualdade	= '==';
+	//igualdade	= '==';
+	diferente	= '<>';
     
 	// 		 Divisores 	    
 	parenteses_esquerdo	= '(';
@@ -75,83 +87,55 @@ Tokens
 	chave_esquerdo		= '}';
 	ponto_virgula		= ';';
 	dois_pontos			= ':';
-    virgula			= ',';
+    virgula				= ',';
     underline			= '_';
     atribuir			= ':=';
 	tab					= ctab;
 	enter				= cr | nl | cr nl;
 	espaco 				= ' ';
 	igual				= '=';
-    
-    
-    //					 Palavras reservadas 				
-    // criar defini��o de estados usados abaixo (  {normal} e {comentario} 
-    reservada 	= word;
-	caracter 	= '''todos''';
-    real 		= digito digito* ',' digito digito*;
-    inteiro 	= digito*; 
-	inicio 	= 'inicio';
-	fim 		= 'fim.';
-	//se 		= "se"; 
-	//senao		= "senao";
-	//enquanto 	= "enquanto";
-	//para 		= "para";
-	//avalie 	="avalie";<= o switch
-	//caso 		= "caso"; <= o case
-	verdadeiro 	= bool_true;
-	falso 		= bool_false;
-	id 			= ('_'|letra)(char|'_')*;
+	programa			= tprograma;
+	inicio 				= tinicio;
+	fim 				= 'fim.';
 	
     
-     
-    //vetor = tipo col id col_e tamanho col_d semi <= type:id[tam];
-    vetor 	= tipos_dados':'sp?('_'|letra)(char|'_')*'['digito*'];';
-    string 	= tipo_string':'sp?( '_'|letra)(char|'_')*'['digito*'];' | '''([todos-'''])*''';
+    //					 Palavras reservadas 				
+    //reservada 	= word;
+	real 		= 'real';
+	inteiro		= 'inteiro';
+    num_real 	= digito digito* ',' digito digito*;
+    num_inteiro = digito*; 
+	se	 		= 'se'; 
+	senao		= 'senao';
+	enquanto 	= 'enquanto';
+	para 		= 'para';
+	avalie	 	= 'avalie';	//<= o switch
+	caso 		= 'caso';	// <= o case
+	verdadeiro 	= bool_true;
+	falso 		= bool_false;
+	escreva		= 'escreva';
+	leia		= 'leia';
+	id 			= ('_'|letra)(char|'_')*;	
+	string		= 'caractere';
+	caracter 	= '''todos''';
+	
+	
+    //vetor 			= tipo col id col_e tamanho col_d semi <= type:id[tam];
+    vetor 				= tipos_dados':'sp? nome'['digito*'];';
+    vetor_error			= tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
+    vetor_string 		= tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
+    vetor_string_error	= tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
     
-    //{normal->comentario, comentario} 
-    
-    //Aplicar pilha
-    //{normal->comentario, comentario} 
-    //{comentario->normal, normal}
 	comentario_linear = cmt_lin;
-	//comentario_mult_abrir = cmt_a; 
-    //comentario_mult_fechar = cmt_f;
     
     {normal->comentario, comentario}
-          comentario = '/*';
+    comentario = '/*';
 	{comentario} comentario_fim = '*/';
 	{comentario} comentario_corpo = [todos -['*' + '/']]*;
 	{comentario} estrela = '*';
 	{comentario} barra = '/';
 	{normal} comentario_fim_erro = '*/';
     
-//Ignored Tokens
-	//espaco;  
-    
 Productions 
-    // Producoes matematicas  
-    program = [left]:inteiro soma [right]:inteiro ponto_virgula;
-    //sub 	= [left]:inteiro subtrair [right]:inteiro ponto_virgula;
-    //pot 	= [left]:inteiro pow [right]:inteiro ponto_virgula;
-    
-    // Producoes logicas 
-    //
-	//    Regras: 
-	//    1) gt,lt,geq,leq, somente exp. logicas
-	//    2) X  a = b  =  c
-	//       O (a = b) = (c = d)
-    
-    
-    // Producoes de dados 
-    //
-    //	"3 - Nao existem vetores com mais de uma dimensao (e se perguntar o que
-	//	significa isso perde meio ponto)."
-	//	String e um vetor de caracter que nao pode ter quebra de linha (\t)	
-    //	vetores = tipo col id [ tam ] <= tam[0:n-1]
-    
-    //	Producoes de comentarios 
-    // Atribuicao
-	//	attr = col igual sp*;
-	
-	
-    
+	// Producoes matematicas  
+	program = [left]:inteiro soma [right]:inteiro ponto_virgula;
