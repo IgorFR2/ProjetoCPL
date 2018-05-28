@@ -11,21 +11,27 @@ public class main {
       if (args.length > 0) { 
          try { 
             /* Form our AST */ 
-            Lexer lexer = new Lexer (new PushbackReader( 
+        	comentarioAninhado lexer = new comentarioAninhado (new PushbackReader( 
                new FileReader(args[0]), 1024)); 
-            
+            int conta_tabs=0;
             while (!lexer.peek().getClass().getSimpleName().equals("EOF")){
             	switch(lexer.peek().getClass().getSimpleName()){
+            		case "TEnter":
+            			System.out.print("\n"); break;
             		case "TEspaco":
             			System.out.print(" "); break;
             		case "TTab":
-            			System.out.print("\t"); break;
+            			System.out.print("\t");conta_tabs++; break;
+            		case "TComentarioFimErro":
+            			System.out.print("Erro de comentario de bloco. Linha: "
+            		                     + lexer.peek().getLine() + ", posicao:"
+            					         + lexer.peek().getPos() + ". :"
+            		                     + lexer.peek().getClass().getSimpleName());
+            			break;
             		default:
-            			System.out.print(lexer.peek().getClass().getSimpleName());
+            			System.out.print(lexer.peek().getClass().getSimpleName()+' ');
             	}
-            	System.out.print(" ");
-            	lexer.next();
-            	
+            	lexer.next();            	
             }
          } 
          catch (Exception e) { 
