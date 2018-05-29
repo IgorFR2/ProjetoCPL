@@ -59,26 +59,7 @@ States
     comentario;
     
 Tokens 
-    // 		Operadores	
-    // Aritmeticos 
-    soma 	= '+';
-	subtrair= '-';
-	mod 	= '%';
-	pow 	= '**';
-	
-	
-	// Logicos 
-	maior		= '>';
-	menor 		= '<';
-	maior_igual = '>=';
-	menor_igual = '<=';
-	nao			= '!';
-	e			= 'e';
-	ou			= '|';
-	//igualdade	= '==';
-	diferente	= '<>';
-    
-	// 		 Divisores 	    
+    	// 		 Divisores 	    
 	parenteses_esquerdo	= '(';
 	parenteses_direito	= ')';
 	colchete_esquerdo	= '[';
@@ -97,6 +78,25 @@ Tokens
 	programa			= tprograma;
 	inicio 				= tinicio;
 	fim 				= 'fim.';
+	
+	// 		Operadores	
+    // Aritmeticos 
+    	soma 	= '+';
+	subtrair= '-';
+	mod 	= '%';
+	pow 	= '**';
+	
+	
+	// Logicos 
+	maior		= '>';
+	menor 		= '<';
+	maior_igual = '>=';
+	menor_igual = '<=';
+	nao			= '!';
+	e			= 'e';
+	ou			= '|';
+	//igualdade	= '==';
+	diferente	= '<>';
 	
     
     //					 Palavras reservadas 				
