@@ -89,7 +89,7 @@ Tokens
 	dois_pontos			= ':';
     virgula				= ',';
     underline			= '_';
-    atribuir			= ':=';
+    atribuir			= '<-';
 	tab					= ctab;
 	enter				= cr | nl | cr nl;
 	espaco 				= ' ';
