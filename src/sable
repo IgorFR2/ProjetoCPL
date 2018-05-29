@@ -65,8 +65,8 @@ Tokens
 	parenteses_direito	= ')';
 	colchete_esquerdo	= '[';
 	colchete_direito	= ']';
-	chave_direita		= '{';
-	chave_esquerdo		= '}';
+	//chave_direita		= '{';
+	//chave_esquerdo		= '}';
 	ponto_virgula		= ';';
 	dois_pontos			= ':';
     virgula				= ',';
