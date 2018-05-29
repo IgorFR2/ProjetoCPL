@@ -1,17 +1,1 @@
-programa primeiro
-inicio
-	inteiro : a , b , c ;
-	real : r  ,  s  ,  p 
-;
-	caractere: f
-, g
-, h
-;
-	se(a=b e nao(c=a) ou r <> s){
-		leia(f)     ;
-	}
-	a <- 1;
-	b <- 2;
-	c < a + b;
-	escreva(c);
-fim.
+{{
