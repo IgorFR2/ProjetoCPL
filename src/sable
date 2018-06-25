@@ -59,13 +59,14 @@ States
     comentario;
     
 Tokens 
-    	// 		 Divisores 	    
+    
+	// 		 Divisores 	    
 	parenteses_esquerdo	= '(';
 	parenteses_direito	= ')';
 	colchete_esquerdo	= '[';
 	colchete_direito	= ']';
-	chave_direita		= '{';
-	chave_esquerdo		= '}';
+	//chave_direita		= '{';
+	//chave_esquerdo		= '}';
 	ponto_virgula		= ';';
 	dois_pontos			= ':';
     virgula				= ',';
@@ -81,11 +82,10 @@ Tokens
 	
 	// 		Operadores	
     // Aritmeticos 
-    	soma 	= '+';
+    soma 	= '+';
 	subtrair= '-';
 	mod 	= '%';
 	pow 	= '**';
-	
 	
 	// Logicos 
 	maior		= '>';
@@ -97,8 +97,8 @@ Tokens
 	ou			= '|';
 	//igualdade	= '==';
 	diferente	= '<>';
-	
     
+	
     //					 Palavras reservadas 				
     //reservada 	= word;
 	real 		= 'real';
