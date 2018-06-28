@@ -1,0 +1,141 @@
+//	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
+/* Falta alguma coisa do LEXICO? (itens da parte 1 do documento que não foram aplicados/totalmente)
+Regras para identificadores:
+4 - Não podemos usar palavras reservadas (ex: inteiro: inteiro;)
+Regras para comentários:
+3 - Os comentários de bloco devem ser aninhados e balanceados.
+Regras para vetores:
+2 - Os índices dos vetores vão de 0 a tam-1 (isso também vale para strings).
+Regras para expressões lógicas:
+1 - Os operadores >, <, >= e <= não podem ser usados com operandos que sejam
+expressões lógicas.
+2 – Os operadores = e <> não podem ser usados em cadeia. Ex.: a = b = c
+3 – Uma cadeia com os operadores = e <> pode ser obtida através do uso de
+parênteses. Ex.: (a = b) = (c = d)
+Operadores:
+3 - Operadores booleanos: 'nao', 'e' e 'ou'.
+4 - A prioridade dos operadores é igual à de C, e pode ser alterada com o uso de
+parênteses.
+6 - Comandos são terminados com ; (ponto e vírgula).
+
+*/
+
+//	Especificacoes gerais: 
+//	1) Id: _*,a*,A* // Proibido ' ',caract. especiais, palavras reservadas
+//	2) String em 'aspas simples'
+//	3) Comentarios em bloco aninhados e balanceados
+
+  
+Package compilador ; 
+     
+Helpers 
+    //	 	Digitos alfanumericos e composicoes 	 
+    letramin	= ['a'..'z'] ;
+    letracaps 	= ['A'..'Z'];
+    letra 		= [letramin + letracaps];
+    digito 		= ['0' .. '9'] ; 
+    sp 			= ' '; 
+   	ctab 		= 9;
+    cr 			= 13;
+    nl 			= 10;
+    nline		= cr | nl | cr nl;
+    char 		= [letra + digito];
+    cmt_lin 	= '//';
+    cmt_a 		= '/*';
+    cmt_f 		= '*/';
+    todos 		= [0 .. 0xFFFF]; 
+    char_esp	= [[[0x20..0xFFFF]-letra]-digito];
+    
+    tipo_string	= 'caractere';
+    tipos_dados	= tipo_string|'real'|'inteiro'|'booleano'; 
+    word		= tipos_dados|'inicio'|'fim'|'se'|'senao'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
+    bool_true	= 'verdadeiro';
+    bool_false	= 'falso';
+    tprograma 	= 'programa';
+    tinicio		= 'inicio';
+    nome		= ('_'|letra)(char|'_')*;
+States
+    normal,
+    comentario;
+    
+Tokens 
+    
+	// 		 Divisores 	    
+	parenteses_esquerdo	= '(';
+	parenteses_direito	= ')';
+	colchete_esquerdo	= '[';
+	colchete_direito	= ']';
+	//chave_direita		= '{';
+	//chave_esquerdo		= '}';
+	ponto_virgula		= ';';
+	dois_pontos			= ':';
+    virgula				= ',';
+    underline			= '_';
+    atribuir			= '<-';
+	tab					= ctab;
+	enter				= cr | nl | cr nl;
+	espaco 				= ' ';
+	igual				= '=';
+	programa			= tprograma;
+	inicio 				= tinicio;
+	fim 				= 'fim.';
+	
+	// 		Operadores	
+    // Aritmeticos 
+    soma 	= '+';
+	subtrair= '-';
+	mod 	= '%';
+	pow 	= '**';
+	
+	// Logicos 
+	maior		= '>';
+	menor 		= '<';
+	maior_igual = '>=';
+	menor_igual = '<=';
+	nao			= '!';
+	e			= 'e';
+	ou			= '|';
+	//igualdade	= '==';
+	diferente	= '<>';
+    
+	
+    //					 Palavras reservadas 				
+    //reservada 	= word;
+	real 		= 'real';
+	inteiro		= 'inteiro';
+    num_real 	= digito digito* ',' digito digito*;
+    num_inteiro = digito*; 
+	se	 		= 'se'; 
+	senao		= 'senao';
+	enquanto 	= 'enquanto';
+	para 		= 'para';
+	avalie	 	= 'avalie';	//<= o switch
+	caso 		= 'caso';	// <= o case
+	verdadeiro 	= bool_true;
+	falso 		= bool_false;
+	escreva		= 'escreva';
+	leia		= 'leia';
+	id 			= ('_'|letra)(char|'_')*;	
+	string		= 'caractere';
+	caracter 	= '''todos''';
+	
+	
+    //vetor 			= tipo col id col_e tamanho col_d semi <= type:id[tam];
+    vetor 				= tipos_dados':'sp? nome'['digito*'];';
+    vetor_error			= tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
+    vetor_string 		= tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
+    vetor_string_error	= tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
+    
+	comentario_linear = cmt_lin;
+    
+    {normal->comentario, comentario}
+    comentario 						= '/*';
+	{comentario} comentario_fim 	= '*/';
+	{comentario} comentario_corpo 	= [todos -['*' + '/']]*;
+	{comentario} estrela			= '*';
+	{comentario} barra 				= '/';
+	{normal} comentario_fim_erro 	= '*/';
+    
+Productions 
+	// Producoes matematicas  
+	program = [left]:inteiro soma [right]:inteiro ponto_virgula;
