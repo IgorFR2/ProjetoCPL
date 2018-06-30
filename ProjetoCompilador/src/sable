@@ -82,10 +82,12 @@ Tokens
 	
 	// 		Operadores	
     // Aritmeticos 
-    soma 	= '+';
-	subtrair= '-';
-	mod 	= '%';
-	pow 	= '**';
+    soma 		= '+';
+	subtrair	= '-';
+	mod 		= '%';
+	potencia	= '**';
+	multiplicar = '*';
+	dividir		= '/';
 	
 	// Logicos 
 	maior		= '>';
@@ -138,45 +140,63 @@ Tokens
 
 // Ainda não funcionando    
 Productions 
-	programa = 'programa' ID 'inicio' (declaracao)* (comando)* 'fim.'
-	declaracao = tipo ':' (var ',')* var ';'
-		| 'const' ID valor ';';
-	tipo = 'real' | 'inteiro' | 'caractere'
-	var = ID | ID '(' N_INT '| ' ' )'
-	valor = STRING | N_INT | N_REAL
+	programa = 'programa' id 'inicio' (declaracao)* (comando)* 'fim.';
+	declaracao = tipo ':' (var ',')* var ';';
+		| 'const' id valor ';';
+	tipo = 'real' | 'inteiro' | 'caractere';
+	var = ID | ID '(' num_inteiro '| ' ' )';
+	valor = vetor_string | num_inteiro | num_real;
 	
 	comando = var ':=' exp ';'
 		| 'leia' 		'(' (var ',')* var ')' ';'
 		| 'escreva' 	'(' (exp ',')* exp ')' ';'
-		| 'se' 			'(' exp-logica ')' 'entao' (comando)* comando ('senao' (comando)* comando | '' ) 'fim se' ';'
-		| 'avalie' 		'(' exp ')' ('caso' valor ':' (comando)*comando)* ('senao' ':'(comando)* comando| ' ' ) 'fim avalie' ';'
+		// Pode usar 'ou vazio'?
+		| 'se' 			'(' exp-logica ')' 'entao' (comando)* comando ('senao' (comando)* comando)? 'fim se' ';' 
+		| 'avalie' 		'(' exp ')' ('caso' valor ':' (comando)*comando)* ('senao' ':'(comando)* comando)? 'fim avalie' ';'
 		| 'enquanto'	'(' exp-logica ')' 'faca' (comando)* comando 'fim enquanto' ';'
 		| 'repita' 		(comando)* comando 'ate' '(' exp-logica ')'';'
-		| 'para' 		var 'de' N_INT 'ate' N_INT 'faca' (comando';')* comando ';' 'fim para' ';'
-		| 'para' 		var 'de' N_INT 'passo' N_INT 'ate' N_INT 'faca' (comando)* comando 'fim para' ';'
+		| 'para' 		var 'de' num_inteiro 'ate' num_inteiro 'faca' (comando';')* comando ';' 'fim para' ';'
+		| 'para' 		var 'de' num_inteiro 'passo' num_inteiro 'ate' num_inteiro 'faca' (comando)* comando 'fim para' ';'
+		;
 	
-	//Melhorar
-	exp = valor
-		| var
-		| '(' exp ')'
-		| '-' exp
-		| exp '+' termo
-		| exp '-' termo
-		| exp '*' termo
-		| exp '/' termo
-		| exp-logica
-	//Melhorar
+	exp = exp operacao termo 
+		| termo
+		;
+	
+	termo =
+		'('exp')'
+		|var
+		; 
+	
+	operacao = 
+		 subtrair
+		|soma
+		|dividir
+		|multiplicar
+		|potencia
+		|mod
+		;
+		
 	exp-logica = 
-		'(' exp-logica ')'
-		| exp '==' termo-logico
-		| exp '<>' termo-logico
-		| exp '<=' termo-logico
-		| exp '>=' termo-logico
-		| exp '<' termo-logico
-		| exp '>' termo-logico
-		| 'nao' exp-logica
-		| exp-logica 'e' termo-logico
-		| exp-logica 'ou' exp-logica
-		| exp-logica 'xor' exp-logica // Fazer produção para X # X # X e que X = (Y) | Y 
+		 exp-logica op termo-logico
+		|termo-logico
+		;
+		
+	termo-logico = var
+				  |'('exp-logica')'
+		;
+	
+	sinal-bool = 
+		 maior		
+		|menor 		
+		|maior_igual 
+		|menor_igual 
+		|nao			
+		|e			
+		|ou			
+		|igualdade	
+		|diferente
+		;	
+		
 
 
