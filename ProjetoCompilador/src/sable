@@ -95,7 +95,7 @@ Tokens
 	nao			= '!';
 	e			= 'e';
 	ou			= '|';
-	//igualdade	= '==';
+	igualdade	= '==';
 	diferente	= '<>';
     
 	
@@ -129,13 +129,54 @@ Tokens
 	comentario_linear = cmt_lin;
     
     {normal->comentario, comentario}
-    comentario 						= '/*';
-	{comentario} comentario_fim 	= '*/';
-	{comentario} comentario_corpo 	= [todos -['*' + '/']]*;
-	{comentario} estrela			= '*';
-	{comentario} barra 				= '/';
-	{normal} comentario_fim_erro 	= '*/';
-    
+    comentario = '/*';
+	{comentario} comentario_fim = '*/';
+	{comentario} comentario_corpo = [todos -['*' + '/']]*;
+	{comentario} estrela = '*';
+	{comentario} barra = '/';
+	{normal} comentario_fim_erro = '*/';
+
+// Ainda não funcionando    
 Productions 
-	// Producoes matematicas  
-	program = [left]:inteiro soma [right]:inteiro ponto_virgula;
+	programa = 'programa' ID 'inicio' (declaracao)* (comando)* 'fim.'
+	declaracao = tipo ':' (var ',')* var ';'
+		| 'const' ID valor ';';
+	tipo = 'real' | 'inteiro' | 'caractere'
+	var = ID | ID '(' N_INT '| ' ' )'
+	valor = STRING | N_INT | N_REAL
+	
+	comando = var ':=' exp ';'
+		| 'leia' 		'(' (var ',')* var ')' ';'
+		| 'escreva' 	'(' (exp ',')* exp ')' ';'
+		| 'se' 			'(' exp-logica ')' 'entao' (comando)* comando ('senao' (comando)* comando | '' ) 'fim se' ';'
+		| 'avalie' 		'(' exp ')' ('caso' valor ':' (comando)*comando)* ('senao' ':'(comando)* comando| ' ' ) 'fim avalie' ';'
+		| 'enquanto'	'(' exp-logica ')' 'faca' (comando)* comando 'fim enquanto' ';'
+		| 'repita' 		(comando)* comando 'ate' '(' exp-logica ')'';'
+		| 'para' 		var 'de' N_INT 'ate' N_INT 'faca' (comando';')* comando ';' 'fim para' ';'
+		| 'para' 		var 'de' N_INT 'passo' N_INT 'ate' N_INT 'faca' (comando)* comando 'fim para' ';'
+	
+	//Melhorar
+	exp = valor
+		| var
+		| '(' exp ')'
+		| '-' exp
+		| exp '+' termo
+		| exp '-' termo
+		| exp '*' termo
+		| exp '/' termo
+		| exp-logica
+	//Melhorar
+	exp-logica = 
+		'(' exp-logica ')'
+		| exp '==' termo-logico
+		| exp '<>' termo-logico
+		| exp '<=' termo-logico
+		| exp '>=' termo-logico
+		| exp '<' termo-logico
+		| exp '>' termo-logico
+		| 'nao' exp-logica
+		| exp-logica 'e' termo-logico
+		| exp-logica 'ou' exp-logica
+		| exp-logica 'xor' exp-logica // Fazer produção para X # X # X e que X = (Y) | Y 
+
+
