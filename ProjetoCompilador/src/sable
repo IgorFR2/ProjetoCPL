@@ -1,30 +1,4 @@
 //	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
-/* Falta alguma coisa do LEXICO? (itens da parte 1 do documento que não foram aplicados/totalmente)
-Regras para identificadores:
-4 - Não podemos usar palavras reservadas (ex: inteiro: inteiro;)
-Regras para comentários:
-3 - Os comentários de bloco devem ser aninhados e balanceados.
-Regras para vetores:
-2 - Os índices dos vetores vão de 0 a tam-1 (isso também vale para strings).
-Regras para expressões lógicas:
-1 - Os operadores >, <, >= e <= não podem ser usados com operandos que sejam
-expressões lógicas.
-2 – Os operadores = e <> não podem ser usados em cadeia. Ex.: a = b = c
-3 – Uma cadeia com os operadores = e <> pode ser obtida através do uso de
-parênteses. Ex.: (a = b) = (c = d)
-Operadores:
-3 - Operadores booleanos: 'nao', 'e' e 'ou'.
-4 - A prioridade dos operadores é igual à de C, e pode ser alterada com o uso de
-parênteses.
-6 - Comandos são terminados com ; (ponto e vírgula).
-
-*/
-
-//	Especificacoes gerais: 
-//	1) Id: _*,a*,A* // Proibido ' ',caract. especiais, palavras reservadas
-//	2) String em 'aspas simples'
-//	3) Comentarios em bloco aninhados e balanceados
-
   
 Package compilador ; 
      
@@ -51,9 +25,10 @@ Helpers
     word		= tipos_dados|'inicio'|'fim'|'se'|'senao'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
     bool_true	= 'verdadeiro';
     bool_false	= 'falso';
-    tprograma 	= 'programa';
-    tinicio		= 'inicio';
+    h_programa 	= 'programa';
+    h_inicio		= 'inicio';
     nome		= ('_'|letra)(char|'_')*;
+
 States
     normal,
     comentario;
@@ -66,7 +41,7 @@ Tokens
 	colchete_esquerdo	= '[';
 	colchete_direito	= ']';
 	//chave_direita		= '{';
-	//chave_esquerdo		= '}';
+	//chave_esquerdo	= '}';
 	ponto_virgula		= ';';
 	dois_pontos			= ':';
     virgula				= ',';
@@ -76,18 +51,19 @@ Tokens
 	enter				= cr | nl | cr nl;
 	espaco 				= ' ';
 	igual				= '=';
-	programa			= tprograma;
-	inicio 				= tinicio;
+	programa			= h_programa;
+	inicio 			= h_inicio;
 	fim 				= 'fim.';
 	
 	// 		Operadores	
     // Aritmeticos 
-    soma 		= '+';
 	subtrair	= '-';
-	mod 		= '%';
-	potencia	= '**';
-	multiplicar = '*';
+    soma 		= '+';
 	dividir		= '/';
+	multiplicar = '*';
+	potencia	= '**';
+	mod 		= '%';
+	
 	
 	// Logicos 
 	maior		= '>';
@@ -99,7 +75,6 @@ Tokens
 	ou			= '|';
 	igualdade	= '==';
 	diferente	= '<>';
-    
 	
     //					 Palavras reservadas 				
     //reservada 	= word;
@@ -137,20 +112,49 @@ Tokens
 	{comentario} estrela = '*';
 	{comentario} barra = '/';
 	{normal} comentario_fim_erro = '*/';
-
-// Ainda não funcionando    
-Productions 
-	programa = 'programa' id 'inicio' (declaracao)* (comando)* 'fim.';
-	declaracao = tipo ':' (var ',')* var ';';
-		| 'const' id valor ';';
-	tipo = 'real' | 'inteiro' | 'caractere';
-	var = ID | ID '(' num_inteiro '| ' ' )';
-	valor = vetor_string | num_inteiro | num_real;
 	
-	comando = var ':=' exp ';'
+	
+
+Productions 
+	inicio = {programa} T.programa;
+	programa	= {declaracao} T.programa id T.inicio declaracao* comando* T.fim;
+	
+	declaracao	= {variavel} tipos_dados dois_pontos assinaturas ponto_virgula ;
+	assinaturas = {assinatura} variavel |{multiplas_assinaturas} variavel virgula assinaturas;
+	
+	variavel	= {nome} id | {vetor} id conchete_esquerdo num_inteiro? colchete_direito;
+	
+	 comando = {atribuicao} var atribuir exp ponto_virgula
+		| {leitura} 'leia' 		parenteses_esquerdo assinaturas var parenteses_direito ponto_virgula
+		| {escrita} 'escreva' 	parenteses_esquerdo expressoes parenteses_direito ponto_virgula
+		| {se}		'se'	 	parenteses_esquerdo exp-logica parenteses_direito 'entao' comandos ('senao' comandos)? 'fim se' ponto_virgula 
+		| {avalie}	'avalie'	parenteses_esquerdo exp parenteses_direito ('caso' valor ':' comandos)* ('senao' ':'comandos)? 'fim avalie' ';'
+		| {enquanto}'enquanto'	parenteses_esquerdo exp-logica parenteses_direito 'faca' comandos 'fim enquanto' ';'
+		| {repita}	'repita'	comandos 'ate' parenteses_esquerdo exp-logica parenteses_direito ponto_virgula
+		| {para}	'para' 		var 'de' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
+		| {para_seg}'para' 		var 'de' num_inteiro 'passo' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
+		;
+	
+	expressoes = {expressao_unitaria} exp | {expressoes} exp virgula expressoes;
+	comandos = {comando_unitario} comando ponto_virgula | {comandos} comando ponto_virgula comandos;
+	exp_logica = 
+		 {operacao_logica} exp_logica op termo_logico 
+		|{operador_logico} termo_logico;
+	    
+	
+
+	
+/*	
+	 OK - programa = 'programa' id 'inicio' (declaracao)* (comando)* 'fim.';
+	 OK - declaracao = tipo ':' (var ',')* var ';';
+		| 'const' id valor ';';
+	 XX - tipo = 'real' | 'inteiro' | 'caractere';
+	 OK - var = ID | ID '(' num_inteiro '| ' ' )';
+	 XX - valor = vetor_string | num_inteiro | num_real;
+	
+	 XX - comando = var ':=' exp ';'
 		| 'leia' 		'(' (var ',')* var ')' ';'
 		| 'escreva' 	'(' (exp ',')* exp ')' ';'
-		// Pode usar 'ou vazio'?
 		| 'se' 			'(' exp-logica ')' 'entao' (comando)* comando ('senao' (comando)* comando)? 'fim se' ';' 
 		| 'avalie' 		'(' exp ')' ('caso' valor ':' (comando)*comando)* ('senao' ':'(comando)* comando)? 'fim avalie' ';'
 		| 'enquanto'	'(' exp-logica ')' 'faca' (comando)* comando 'fim enquanto' ';'
@@ -197,6 +201,6 @@ Productions
 		|igualdade	
 		|diferente
 		;	
+*/
+
 		
-
-
