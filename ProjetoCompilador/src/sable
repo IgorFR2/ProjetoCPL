@@ -58,7 +58,7 @@ Tokens
 	// 		Operadores	
     // Aritmeticos 
 	subtrair	= '-';
-    soma 		= '+';
+    somar 		= '+';
 	dividir		= '/';
 	multiplicar = '*';
 	potencia	= '**';
@@ -93,8 +93,10 @@ Tokens
 	escreva		= 'escreva';
 	leia		= 'leia';
 	id 			= ('_'|letra)(char|'_')*;	
-	string		= 'caractere';
+	t_caractere =  'caractere';
+	string		= t_caractere;
 	caracter 	= '''todos''';
+	
 	
 	
     //vetor 			= tipo col id col_e tamanho col_d semi <= type:id[tam];
@@ -113,84 +115,15 @@ Tokens
 	{comentario} barra = '/';
 	{normal} comentario_fim_erro = '*/';
 	
-	
-
-Productions 
-	inicio = {programa} T.programa;
-	programa	= {declaracao} T.programa id T.inicio declaracao* comando* T.fim;
-	
-	declaracao	= {variavel} tipos_dados dois_pontos assinaturas ponto_virgula ;
-	assinaturas = {assinatura} variavel |{multiplas_assinaturas} variavel virgula assinaturas;
-	
-	variavel	= {nome} id | {vetor} id conchete_esquerdo num_inteiro? colchete_direito;
-	
-	 comando = {atribuicao} var atribuir exp ponto_virgula
-		| {leitura} 'leia' 		parenteses_esquerdo assinaturas var parenteses_direito ponto_virgula
-		| {escrita} 'escreva' 	parenteses_esquerdo expressoes parenteses_direito ponto_virgula
-		| {se}		'se'	 	parenteses_esquerdo exp-logica parenteses_direito 'entao' comandos ('senao' comandos)? 'fim se' ponto_virgula 
-		| {avalie}	'avalie'	parenteses_esquerdo exp parenteses_direito ('caso' valor ':' comandos)* ('senao' ':'comandos)? 'fim avalie' ';'
-		| {enquanto}'enquanto'	parenteses_esquerdo exp-logica parenteses_direito 'faca' comandos 'fim enquanto' ';'
-		| {repita}	'repita'	comandos 'ate' parenteses_esquerdo exp-logica parenteses_direito ponto_virgula
-		| {para}	'para' 		var 'de' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
-		| {para_seg}'para' 		var 'de' num_inteiro 'passo' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
-		;
-	
-	expressoes = {expressao_unitaria} exp | {expressoes} exp virgula expressoes;
-	comandos = {comando_unitario} comando ponto_virgula | {comandos} comando ponto_virgula comandos;
-	exp_logica = 
-		 {operacao_logica} exp_logica op termo_logico 
-		|{operador_logico} termo_logico;
-	    
-	
-
-	
-/*	
-	 OK - programa = 'programa' id 'inicio' (declaracao)* (comando)* 'fim.';
-	 OK - declaracao = tipo ':' (var ',')* var ';';
-		| 'const' id valor ';';
-	 XX - tipo = 'real' | 'inteiro' | 'caractere';
-	 OK - var = ID | ID '(' num_inteiro '| ' ' )';
-	 XX - valor = vetor_string | num_inteiro | num_real;
-	
-	 XX - comando = var ':=' exp ';'
-		| 'leia' 		'(' (var ',')* var ')' ';'
-		| 'escreva' 	'(' (exp ',')* exp ')' ';'
-		| 'se' 			'(' exp-logica ')' 'entao' (comando)* comando ('senao' (comando)* comando)? 'fim se' ';' 
-		| 'avalie' 		'(' exp ')' ('caso' valor ':' (comando)*comando)* ('senao' ':'(comando)* comando)? 'fim avalie' ';'
-		| 'enquanto'	'(' exp-logica ')' 'faca' (comando)* comando 'fim enquanto' ';'
-		| 'repita' 		(comando)* comando 'ate' '(' exp-logica ')'';'
-		| 'para' 		var 'de' num_inteiro 'ate' num_inteiro 'faca' (comando';')* comando ';' 'fim para' ';'
-		| 'para' 		var 'de' num_inteiro 'passo' num_inteiro 'ate' num_inteiro 'faca' (comando)* comando 'fim para' ';'
-		;
-	
-	exp = exp operacao termo 
-		| termo
-		;
-	
-	termo =
-		'('exp')'
-		|var
-		; 
-	
 	operacao = 
 		 subtrair
-		|soma
+		|somar
 		|dividir
 		|multiplicar
 		|potencia
 		|mod
 		;
-		
-	exp-logica = 
-		 exp-logica op termo-logico
-		|termo-logico
-		;
-		
-	termo-logico = var
-				  |'('exp-logica')'
-		;
-	
-	sinal-bool = 
+	sinal_bool = 
 		 maior		
 		|menor 		
 		|maior_igual 
@@ -200,7 +133,50 @@ Productions
 		|ou			
 		|igualdade	
 		|diferente
+		;
+
+Productions 
+	inicio = {programa} T.programa;
+	programa	= {corpo} T.programa id T.inicio declaracao* comando* T.fim;
+	
+	declaracao	= {corpo} tipos_dados dois_pontos variaveis ponto_virgula ;
+	variaveis = {variavel} variavel |{variaveis} variavel virgula variaveis;
+	
+	variavel	= {nome} id | {vetor} id conchete_esquerdo num_inteiro colchete_direito ;
+	valor = {val_caractere} vetor_string | {val_inteiro} num_inteiro | {val_real} num_real;
+	comando = {atribuicao} variavel atribuir exp ponto_virgula
+		| {leitura} 'leia' 		parenteses_esquerdo variavel parenteses_direito ponto_virgula
+		| {escrita} 'escreva' 	parenteses_esquerdo expressoes parenteses_direito ponto_virgula
+		| {se}		'se'	 	parenteses_esquerdo exp-logica parenteses_direito 'entao' comandos ('senao' comandos)? 'fim se' ponto_virgula 
+		| {avalie}	'avalie'	parenteses_esquerdo exp parenteses_direito ('caso' valor ':' comandos)* ('senao' ':'comandos)? 'fim avalie' ';'
+		| {enquanto}'enquanto'	parenteses_esquerdo exp-logica parenteses_direito 'faca' comandos 'fim enquanto' ';'
+		| {repita}	'repita'	comandos 'ate' parenteses_esquerdo exp-logica parenteses_direito ponto_virgula
+		| {para}	'para' 		variavel 'de' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
+		| {para_seg}'para' 		variavel 'de' num_inteiro 'passo' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
+		;
+	
+	expressao = {termo} termo | {somar} expressao soma termo | {subtrair} expressao subtrair termo;
+	termo = {fator} fator| {multiplicar} termo multiplicar  fator| {dividir} termo dividir fator; 
+	fator = {num_inteiro} num_inteiro | {num_real} num_real | {expressao} parenteses_esquerdo expressao parenteses_direito;
+	
+	comandos = {comando_unitario} comando ponto_virgula | {comandos} comando ponto_virgula comandos;
+	exp_logica = 
+		 {operacao_logica} exp_logica sinal_bool termo_logico 
+		|{operador_logico} termo_logico;
+	    
+	termo-logico = {unidade_logica} variavel
+				  |{expressao_logica}'('exp-logica')';
+	
+	sinal-bool = 
+		 {maior}	 maior		
+		|{menor}	 menor 		
+		|{maior_ig}	 maior_igual 
+		|{menor_ig}  menor_igual 
+		|{not} 		 nao		
+		|{e} 		 e			
+		|{ou} 		 ou			
+		|{igualdade} igualdade	
+		|{diferente} diferente
 		;	
-*/
 
 		
