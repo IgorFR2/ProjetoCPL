@@ -155,6 +155,7 @@ Productions
 	
 	variavel	= {nome} id | {vetor} id conchete_esquerdo num_inteiro colchete_direito ;
 	valor = {val_caractere} vetor_string | {val_inteiro} num_inteiro | {val_real} num_real;
+	
 	comando = {atribuicao} variavel atribuir exp ponto_virgula
 		| {leitura} T.leia 		parenteses_esquerdo variavel parenteses_direito ponto_virgula
 		| {escrita} T.escreva 	parenteses_esquerdo expressoes parenteses_direito ponto_virgula
@@ -163,17 +164,25 @@ Productions
 		| {enquanto}T.enquanto	parenteses_esquerdo exp-logica parenteses_direito faca comandos fimenquanto ponto_virgula
 		| {repita}	T.repita	comandos T.ate parenteses_esquerdo exp-logica parenteses_direito ponto_virgula
 		| {para}	T.para 		variavel T.de num_inteiro ate num_inteiro faca comandos T.fimpara ponto_virgula
-		| {para_seg}T.para 		variavel T.de num_inteiro T.passo num_inteiro T.ate num_inteiro T.faca comandos T.fimpara ponto_virgula
-		;
+		| {para_seg}T.para 		variavel T.de num_inteiro T.passo num_inteiro T.ate num_inteiro T.faca comandos T.fimpara ponto_virgula;
 	
-	expressao = {termo} termo | {somar} expressao soma termo | {subtrair} expressao subtrair termo;
-	termo = {fator} fator| {multiplicar} termo multiplicar  fator| {dividir} termo dividir fator; 
-	fator = {num_inteiro} num_inteiro | {num_real} num_real | {expressao} parenteses_esquerdo expressao parenteses_direito;
+	expressao = {termo} termo 
+				| {somar} expressao soma termo 
+				| {subtrair} expressao subtrair termo;
+				
+	termo = {fator} fator
+			| {multiplicar} termo multiplicar  fator
+			| {dividir} termo dividir fator; 
+			
+	fator = {num_inteiro} num_inteiro 
+			| {num_real} num_real 
+			| {expressao} parenteses_esquerdo expressao parenteses_direito;
 	
-	comandos = {comando_unitario} comando ponto_virgula | {comandos} comando ponto_virgula comandos;
-	exp_logica = 
-		 {operacao_logica} exp_logica sinal_bool termo_logico 
-		|{operador_logico} termo_logico;
+	comandos = {comando_unitario} comando ponto_virgula 
+				| {comandos} comando ponto_virgula comandos;
+				
+	exp_logica = {operacao_logica} exp_logica sinal_bool termo_logico 
+				|{operador_logico} termo_logico;
 	    
 	termo-logico = {unidade_logica} variavel
 				  |{expressao_logica}parenteses_direito exp-logica parenteses_esquerdo;
@@ -182,12 +191,11 @@ Productions
 		 {maior}	 maior		
 		|{menor}	 menor 		
 		|{maior_ig}	 maior_igual 
-		|{menor_ig}  menor_igual 
+		|{menor_ig}	 menor_igual 
 		|{not} 		 nao		
 		|{e} 		 e			
 		|{ou} 		 ou			
 		|{igualdade} igualdade	
-		|{diferente} diferente
-		;	
+		|{diferente} diferente;	
 
 		
