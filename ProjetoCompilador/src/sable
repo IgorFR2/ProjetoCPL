@@ -1,0 +1,182 @@
+//	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
+  
+Package compilador ; 
+     
+Helpers 
+    //	 	Digitos alfanumericos e composicoes 	 
+    letramin	= ['a'..'z'] ;
+    letracaps 	= ['A'..'Z'];
+    letra 		= [letramin + letracaps];
+    digito 		= ['0' .. '9'] ; 
+    sp 			= ' '; 
+   	ctab 		= 9;
+    cr 			= 13;
+    nl 			= 10;
+    nline		= cr | nl | cr nl;
+    char 		= [letra + digito];
+    cmt_lin 	= '//';
+    cmt_a 		= '/*';
+    cmt_f 		= '*/';
+    todos 		= [0 .. 0xFFFF]; 
+    char_esp	= [[[0x20..0xFFFF]-letra]-digito];
+    
+    tipo_string	= 'caractere';
+    tipos_dados	= tipo_string|'real'|'inteiro'|'booleano'; 
+    word		= tipos_dados|'inicio'|'fim'|'se'|'senao'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
+    bool_true	= 'verdadeiro';
+    bool_false	= 'falso';
+    h_programa 	= 'programa';
+    h_inicio		= 'inicio';
+    nome		= ('_'|letra)(char|'_')*;
+
+States
+    normal,
+    comentario;
+    
+Tokens 
+    
+	// 		 Divisores 	    
+	parenteses_esquerdo	= '(';
+	parenteses_direito	= ')';
+	colchete_esquerdo	= '[';
+	colchete_direito	= ']';
+	//chave_direita		= '{';
+	//chave_esquerdo	= '}';
+	ponto_virgula		= ';';
+	dois_pontos			= ':';
+    virgula				= ',';
+    underline			= '_';
+    atribuir			= '<-';
+	tab					= ctab;
+	enter				= cr | nl | cr nl;
+	espaco 				= ' ';
+	igual				= '=';
+	programa			= h_programa;
+	inicio 			= h_inicio;
+	fim 				= 'fim.';
+	
+	// 		Operadores	
+    // Aritmeticos 
+	subtrair	= '-';
+    somar 		= '+';
+	dividir		= '/';
+	multiplicar = '*';
+	potencia	= '**';
+	mod 		= '%';
+	
+	
+	// Logicos 
+	maior		= '>';
+	menor 		= '<';
+	maior_igual = '>=';
+	menor_igual = '<=';
+	nao			= '!';
+	e			= 'e';
+	ou			= '|';
+	igualdade	= '==';
+	diferente	= '<>';
+	
+    //					 Palavras reservadas 				
+    //reservada 	= word;
+	real 		= 'real';
+	inteiro		= 'inteiro';
+    num_real 	= digito digito* ',' digito digito*;
+    num_inteiro = digito*; 
+	se	 		= 'se'; 
+	senao		= 'senao';
+	enquanto 	= 'enquanto';
+	para 		= 'para';
+	avalie	 	= 'avalie';	//<= o switch
+	caso 		= 'caso';	// <= o case
+	verdadeiro 	= bool_true;
+	falso 		= bool_false;
+	escreva		= 'escreva';
+	leia		= 'leia';
+	id 			= ('_'|letra)(char|'_')*;	
+	t_caractere =  'caractere';
+	string		= t_caractere;
+	caracter 	= '''todos''';
+	
+	
+	
+    //vetor 			= tipo col id col_e tamanho col_d semi <= type:id[tam];
+    vetor 				= tipos_dados':'sp? nome'['digito*'];';
+    vetor_error			= tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
+    vetor_string 		= tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
+    vetor_string_error	= tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
+    
+	comentario_linear = cmt_lin;
+    
+    {normal->comentario, comentario}
+    comentario = '/*';
+	{comentario} comentario_fim = '*/';
+	{comentario} comentario_corpo = [todos -['*' + '/']]*;
+	{comentario} estrela = '*';
+	{comentario} barra = '/';
+	{normal} comentario_fim_erro = '*/';
+	
+	operacao = 
+		 subtrair
+		|somar
+		|dividir
+		|multiplicar
+		|potencia
+		|mod
+		;
+	sinal_bool = 
+		 maior		
+		|menor 		
+		|maior_igual 
+		|menor_igual 
+		|nao			
+		|e			
+		|ou			
+		|igualdade	
+		|diferente
+		;
+
+Productions 
+	inicio = {programa} T.programa;
+	programa	= {corpo} T.programa id T.inicio declaracao* comando* T.fim;
+	
+	declaracao	= {corpo} tipos_dados dois_pontos variaveis ponto_virgula ;
+	variaveis = {variavel} variavel |{variaveis} variavel virgula variaveis;
+	
+	variavel	= {nome} id | {vetor} id conchete_esquerdo num_inteiro colchete_direito ;
+	valor = {val_caractere} vetor_string | {val_inteiro} num_inteiro | {val_real} num_real;
+	comando = {atribuicao} variavel atribuir exp ponto_virgula
+		| {leitura} 'leia' 		parenteses_esquerdo variavel parenteses_direito ponto_virgula
+		| {escrita} 'escreva' 	parenteses_esquerdo expressoes parenteses_direito ponto_virgula
+		| {se}		'se'	 	parenteses_esquerdo exp-logica parenteses_direito 'entao' comandos ('senao' comandos)? 'fim se' ponto_virgula 
+		| {avalie}	'avalie'	parenteses_esquerdo exp parenteses_direito ('caso' valor ':' comandos)* ('senao' ':'comandos)? 'fim avalie' ';'
+		| {enquanto}'enquanto'	parenteses_esquerdo exp-logica parenteses_direito 'faca' comandos 'fim enquanto' ';'
+		| {repita}	'repita'	comandos 'ate' parenteses_esquerdo exp-logica parenteses_direito ponto_virgula
+		| {para}	'para' 		variavel 'de' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
+		| {para_seg}'para' 		variavel 'de' num_inteiro 'passo' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
+		;
+	
+	expressao = {termo} termo | {somar} expressao soma termo | {subtrair} expressao subtrair termo;
+	termo = {fator} fator| {multiplicar} termo multiplicar  fator| {dividir} termo dividir fator; 
+	fator = {num_inteiro} num_inteiro | {num_real} num_real | {expressao} parenteses_esquerdo expressao parenteses_direito;
+	
+	comandos = {comando_unitario} comando ponto_virgula | {comandos} comando ponto_virgula comandos;
+	exp_logica = 
+		 {operacao_logica} exp_logica sinal_bool termo_logico 
+		|{operador_logico} termo_logico;
+	    
+	termo-logico = {unidade_logica} variavel
+				  |{expressao_logica}'('exp-logica')';
+	
+	sinal-bool = 
+		 {maior}	 maior		
+		|{menor}	 menor 		
+		|{maior_ig}	 maior_igual 
+		|{menor_ig}  menor_igual 
+		|{not} 		 nao		
+		|{e} 		 e			
+		|{ou} 		 ou			
+		|{igualdade} igualdade	
+		|{diferente} diferente
+		;	
+
+		
