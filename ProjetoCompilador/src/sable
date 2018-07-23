@@ -84,9 +84,14 @@ Tokens
     num_inteiro = digito*; 
 	se	 		= 'se'; 
 	senao		= 'senao';
+	fimse		= 'fimse.';
+	fimsenao	= 'fimsenao.';
 	enquanto 	= 'enquanto';
+	fimenquanto	= 'fimenquanto';
 	para 		= 'para';
+	fimpara		= 'fimpara';
 	avalie	 	= 'avalie';	//<= o switch
+	fimavalie	= 'fimavalie';
 	caso 		= 'caso';	// <= o case
 	verdadeiro 	= bool_true;
 	falso 		= bool_false;
@@ -97,6 +102,12 @@ Tokens
 	string		= t_caractere;
 	caracter 	= '''todos''';
 	
+	//						Conectores
+	
+	de		= 'de';
+	ate		= 'ate';
+	passo	= 'passo';
+	faca	= 'faca'; 
 	
 	
     //vetor 			= tipo col id col_e tamanho col_d semi <= type:id[tam];
@@ -145,14 +156,14 @@ Productions
 	variavel	= {nome} id | {vetor} id conchete_esquerdo num_inteiro colchete_direito ;
 	valor = {val_caractere} vetor_string | {val_inteiro} num_inteiro | {val_real} num_real;
 	comando = {atribuicao} variavel atribuir exp ponto_virgula
-		| {leitura} 'leia' 		parenteses_esquerdo variavel parenteses_direito ponto_virgula
-		| {escrita} 'escreva' 	parenteses_esquerdo expressoes parenteses_direito ponto_virgula
-		| {se}		'se'	 	parenteses_esquerdo exp-logica parenteses_direito 'entao' comandos ('senao' comandos)? 'fim se' ponto_virgula 
-		| {avalie}	'avalie'	parenteses_esquerdo exp parenteses_direito ('caso' valor ':' comandos)* ('senao' ':'comandos)? 'fim avalie' ';'
-		| {enquanto}'enquanto'	parenteses_esquerdo exp-logica parenteses_direito 'faca' comandos 'fim enquanto' ';'
-		| {repita}	'repita'	comandos 'ate' parenteses_esquerdo exp-logica parenteses_direito ponto_virgula
-		| {para}	'para' 		variavel 'de' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
-		| {para_seg}'para' 		variavel 'de' num_inteiro 'passo' num_inteiro 'ate' num_inteiro 'faca' comandos 'fim para' ';'
+		| {leitura} T.leia 		parenteses_esquerdo variavel parenteses_direito ponto_virgula
+		| {escrita} T.escreva 	parenteses_esquerdo expressoes parenteses_direito ponto_virgula
+		| {se}		T.se	 	parenteses_esquerdo exp-logica parenteses_direito entao comandos (senao comandos)? fimse ponto_virgula 
+		| {avalie}	T.avalie	parenteses_esquerdo exp parenteses_direito (T.caso valor dois_pontos comandos)* (T.senao comandos)? fimavalie ponto_virgula
+		| {enquanto}T.enquanto	parenteses_esquerdo exp-logica parenteses_direito faca comandos fimenquanto ponto_virgula
+		| {repita}	T.repita	comandos T.ate parenteses_esquerdo exp-logica parenteses_direito ponto_virgula
+		| {para}	T.para 		variavel T.de num_inteiro ate num_inteiro faca comandos T.fimpara ponto_virgula
+		| {para_seg}T.para 		variavel T.de num_inteiro T.passo num_inteiro T.ate num_inteiro T.faca comandos T.fimpara ponto_virgula
 		;
 	
 	expressao = {termo} termo | {somar} expressao soma termo | {subtrair} expressao subtrair termo;
@@ -165,7 +176,7 @@ Productions
 		|{operador_logico} termo_logico;
 	    
 	termo-logico = {unidade_logica} variavel
-				  |{expressao_logica}'('exp-logica')';
+				  |{expressao_logica}parenteses_direito exp-logica parenteses_esquerdo;
 	
 	sinal-bool = 
 		 {maior}	 maior		
