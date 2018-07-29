@@ -1,196 +1,205 @@
 /*
+www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
+
 Configurações do sable no linux:
 - Location: /usr/lib/jvm/java-8-openjdk/jre/bin/java
 - Working Directory: ${container_loc}
 - Arguments: -classpath /home/igorfr2/Desktop/sablecc-3.2/lib/sablecc.jar org.sablecc.sablecc.SableCC ${resource_name}
 */
-//	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
-  
-Package compilador ; 
-     
+
+Package compilador ;
+
+
 Helpers 
-    //	 	Digitos alfanumericos e composicoes 	 
-    letramin	= ['a'..'z'] ;
-    letracaps 	= ['A'..'Z'];
-    letra 		= [letramin + letracaps];
-    digito 		= ['0' .. '9'] ; 
-    sp 			= ' '; 
-   	ctab 		= 9;
-    cr 			= 13;
-    nl 			= 10;
-    nline		= cr | nl | cr nl;
-    char 		= [letra + digito];
-    cmt_lin 	= '//';
-    cmt_a 		= '/*';
-    cmt_f 		= '*/';
-    todos 		= [0 .. 0xFFFF]; 
-    char_esp	= [[[0x20..0xFFFF]-letra]-digito];
-    
-    tipo_string	= 'caractere';
-    tipos_dados	= tipo_string|'real'|'inteiro'|'booleano'; 
-    word		= tipos_dados|'inicio'|'fim'|'se'|'senao'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
-    bool_true	= 'verdadeiro';
-    bool_false	= 'falso';
-    h_programa 	= 'programa';
-    h_inicio		= 'inicio';
-    nome		= ('_'|letra)(char|'_')*;
+    // Digitos alfanumericos e composicoes
+    letramin    = ['a'..'z'] ;
+    letracaps   = ['A'..'Z'];
+    letra       = [letramin + letracaps];
+    digito      = ['0' .. '9'] ;
+    sp          = ' ';
+    ctab        = 9;
+    cr          = 13;
+    nl          = 10;
+    nline       = cr | nl | cr nl;
+    char        = [letra + digito];
+    cmt_linha     = '//';
+    cmt_a       = '/*';
+    cmt_f       = '*/';
+    todos       = [0 .. 0xFFFF];
+    char_esp    = [[[0x20..0xFFFF]-letra]-digito];
+
+    tipo_string = 'caractere';
+    tipos_dados = tipo_string|'real'|'inteiro'|'booleano';
+    word        = tipos_dados|'inicio'|'fim'|'se'|'senao'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
+    bool_true   = 'verdadeiro';
+    bool_false  = 'falso';
+    h_programa  = 'programa';
+    h_inicio    = 'inicio';
+    nome        = ('_'|letra)(char|'_')*;
+
 
 States
     normal,
     comentario;
+
+
+Tokens
+    // Divisores
+    parenteses_esquerdo = '(';
+    parenteses_direito  = ')';
+    colchete_esquerdo   = '[';
+    colchete_direito    = ']';
+    //chave_direita     = '{';
+    //chave_esquerdo    = '}';
+    ponto_virgula       = ';';
+    dois_pontos         = ':';
+    virgula             = ',';
+    underline           = '_';
+    atribuir            = '<-';
+    tab                 = ctab;
+    enter               = cr | nl | cr nl;
+    espaco              = ' ';
+    igual               = '=';
+    programa            = h_programa;
+    inicio              = h_inicio;
+    fim                 = 'fim.';
     
-Tokens 
+    // Operadores Aritmeticos
+    subtrair    = '-';
+    somar       = '+';
+    dividir     = '/';
+    multiplicar = '*';
+    potencia    = '**';
+    mod         = '%';
+
+    // Operadores Logicos
+    maior       = '>';
+    menor       = '<';
+    maior_igual = '>=';
+    menor_igual = '<=';
+    nao         = '!';
+    e           = 'e';
+    ou          = '|';
+    igualdade   = '==';
+    diferente   = '<>';
     
-	// 		 Divisores 	    
-	parenteses_esquerdo	= '(';
-	parenteses_direito	= ')';
-	colchete_esquerdo	= '[';
-	colchete_direito	= ']';
-	//chave_direita		= '{';
-	//chave_esquerdo	= '}';
-	ponto_virgula		= ';';
-	dois_pontos			= ':';
-    virgula				= ',';
-    underline			= '_';
-    atribuir			= '<-';
-	tab					= ctab;
-	enter				= cr | nl | cr nl;
-	espaco 				= ' ';
-	igual				= '=';
-	programa			= h_programa;
-	inicio 			= h_inicio;
-	fim 				= 'fim.';
-	
-	// 		Operadores	
-    // Aritmeticos 
-	subtrair	= '-';
-    somar 		= '+';
-	dividir		= '/';
-	multiplicar = '*';
-	potencia	= '**';
-	mod 		= '%';
-	
-	
-	// Logicos 
-	maior		= '>';
-	menor 		= '<';
-	maior_igual = '>=';
-	menor_igual = '<=';
-	nao			= '!';
-	e			= 'e';
-	ou			= '|';
-	igualdade	= '==';
-	diferente	= '<>';
-	
-    //					 Palavras reservadas 				
-    //reservada 	= word;
-	real 		= 'real';
-	inteiro		= 'inteiro';
-    num_real 	= digito digito* ',' digito digito*;
+    // Palavras reservadas
+    //reservada  = word;
+    real         = 'real';
+    inteiro      = 'inteiro';
+    t_caractere = 'caractere';
+    num_real     = digito digito* ',' digito digito*;
     num_inteiro = digito*; 
-	se	 		= 'se'; 
-	entao		= 'entao';
-	senao		= 'senao';
-	fimse		= 'fim se.';
-	fimsenao	= 'fim senao.';
-	enquanto 	= 'enquanto';
-	fimenquanto	= 'fim enquanto';
-	para 		= 'para';
-	fimpara		= 'fim para';
-	repita		= 'repita';
-	avalie	 	= 'avalie';	//<= o switch
-	fimavalie	= 'fim avalie';
-	caso 		= 'caso';	// <= o case
-	verdadeiro 	= bool_true;
-	falso 		= bool_false;
-	escreva		= 'escreva';
-	leia		= 'leia';
-	id 			= ('_'|letra)(char|'_')*;	
-	t_caractere = 'caractere';
-	tipos_dados	= tipos_dados;
-	caracter 	= '''todos''';
-	
-	//						Conectores
-	
-	de		= 'de';
-	ate		= 'ate';
-	passo	= 'passo';
-	faca	= 'faca'; 
-	
-	
-    //vetor 			= tipo col id col_e tamanho col_d semi <= type:id[tam];
-    vetor 				= tipos_dados':'sp? nome'['digito*'];';
-    vetor_error			= tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
-    vetor_string 		= tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
-    vetor_string_error	= tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
+    se             = 'se'; 
+    entao        = 'entao';
+    senao        = 'senao';
+    fimse        = 'fim se.';
+    fimsenao    = 'fim senao.';
+    enquanto     = 'enquanto';
+    fimenquanto    = 'fim enquanto';
+    para         = 'para';
+    fimpara        = 'fim para';
+    repita        = 'repita';
+    avalie         = 'avalie';    //<= o switch
+    fimavalie    = 'fim avalie';
+    caso         = 'caso';    // <= o case
+    verdadeiro     = bool_true;
+    falso         = bool_false;
+    escreva        = 'escreva';
+    leia        = 'leia';
+    id             = ('_'|letra)(char|'_')*;
+    tipos_dados    = tipos_dados;
+    caracter     = '''todos''';
     
-	comentario_linear = cmt_lin;
-    
-    {normal->comentario, comentario}
-    comentario = '/*';
-	{comentario} comentario_fim = '*/';
-	{comentario} comentario_corpo = [todos -['*' + '/']]*;
-	{comentario} estrela = '*';
-	{comentario} barra = '/';
-	{normal} comentario_fim_erro = '*/';
-	
+    //  Conectores
+    de        = 'de';
+    ate        = 'ate';
+    passo    = 'passo';
+    faca    = 'faca'; 
+
+    //vetor             = tipo col id col_e tamanho col_d semi <= type:id[tam];
+    vetor                 = tipos_dados':'sp? nome'['digito*'];';
+    vetor_error            = tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
+    vetor_string         = tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
+    vetor_string_error    = tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
+
+    // Comentarios
+    comentario_linear = cmt_linha;
+    {normal->comentario, comentario} comentario = '/*';
+    {comentario} comentario_fim = '*/';
+    {comentario} comentario_corpo = [todos -['*' + '/']]*;
+    {comentario} estrela = '*';
+    {comentario} barra = '/';
+    {normal} comentario_fim_erro = '*/';
+
+
+Ignored Tokens
+    enter, espaco, tab, comentario_fim_erro;
 
 
 Productions 
-	inicio = {programa} P.programa;
-	programa	= {corpo} T.programa id T.inicio declaracao comando* T.fim;
-	
-	declaracao	= {declaracao} tipos_dados dois_pontos variaveis ponto_virgula
-				  |{declaracoes} ;
-	variaveis = {variavel} variavel |{variaveis} variavel virgula variaveis;
-	variavel	= {nome} id | {vetor} id colchete_esquerdo num_inteiro colchete_direito ;
-	
-	valor = {val_caractere} vetor_string | {val_inteiro} num_inteiro | {val_real} num_real;
-	
-	comando = {atribuicao} variavel atribuir expressao ponto_virgula
-		| {leitura} T.leia 		parenteses_esquerdo variavel parenteses_direito ponto_virgula
-		| {escrita} T.escreva 	parenteses_esquerdo expressao parenteses_direito ponto_virgula
-		| {se}		T.se	 	parenteses_esquerdo exp_logica parenteses_direito entao comandos senao_comandos fimse ponto_virgula 
-		| {avalie}	T.avalie	parenteses_esquerdo expressao parenteses_direito caso_comandos senao_comandos fimavalie ponto_virgula
-		| {enquanto}T.enquanto	parenteses_esquerdo exp_logica parenteses_direito faca comandos fimenquanto ponto_virgula
-		| {repita}	T.repita	comandos ate parenteses_esquerdo exp_logica parenteses_direito ponto_virgula
-		| {para}	T.para 		variavel de [left]:num_inteiro ate [right]:num_inteiro faca comandos fimpara ponto_virgula
-		| {para_seg}T.para 		variavel de [left]:num_inteiro passo num_inteiro ate [right]:num_inteiro faca comandos fimpara ponto_virgula;
-	
-	comandos = {comando_unitario} comando ponto_virgula 
-				| {comandos} comando ponto_virgula comandos;
-	senao_comandos = senao comando;
-	caso_comandos = {caso} caso valor dois_pontos comando ponto_virgula
-					|{casos} caso valor dois_pontos comando caso_comandos ;
-	
-	expressao = {termo} termo 
-				| {somar} expressao somar termo 
-				| {subtrair} expressao subtrair termo;
-				
-	termo = {fator} fator
-			| {multiplicar} termo multiplicar  fator
-			| {dividir} termo dividir fator; 
-			
-	fator = {num_inteiro} num_inteiro 
-			| {num_real} num_real 
-			| {expressao} parenteses_esquerdo expressao parenteses_direito;
-	
-				
-	exp_logica = {operacao_logica} exp_logica sinal_bool termo_logico 
-				|{operador_logico} termo_logico;
-	    
-	termo_logico = {unidade_logica} variavel
-				  |{expressao_logica} parenteses_direito exp_logica parenteses_esquerdo;
-	
-	sinal_bool = 
-		 {maior}	 maior		
-		|{menor}	 menor 		
-		|{maior_ig}	 maior_igual 
-		|{menor_ig}	 menor_igual 
-		|{not} 		 nao		
-		|{e} 		 e			
-		|{ou} 		 ou			
-		|{igualdade} igualdade	
-		|{diferente} diferente;	
+    inicio = {programa} P.programa;
+    programa = {corpo} T.programa  T.id  T.inicio  P.declaracoes  P.comando*  T.fim;
 
-		
+    // OBS.: com essas producoes, se faz necessario ter pelo menos uma declaracao
+    declaracoes = {declaracao} P.declaracao  P.declaracoes
+                  | {fim_declaracao} ;
+    declaracao = P.tipos_dados  T.dois_pontos  P.variaveis  T.ponto_virgula;
+    tipos_dados = {inteiro} T.inteiro | {real} T.real | {caractere} T.t_caractere;
+    variaveis = {variavel} P.variavel | {variaveis} P.variavel  T.virgula  P.variaveis;
+    variavel = {nome} T.id | {vetor} T.id  T.colchete_esquerdo  T.num_inteiro  T.colchete_direito ;
+    
+    valor = {val_caractere} vetor_string | {val_inteiro} num_inteiro | {val_real} num_real;
+    
+    comando = {atribuicao} variavel atribuir expressao ponto_virgula
+        | {leitura}  T.leia  parenteses_esquerdo variavel parenteses_direito ponto_virgula
+        | {escrita}  T.escreva  parenteses_esquerdo expressao parenteses_direito ponto_virgula
+        | {se}       T.se  T.parenteses_esquerdo  exp_logica  T.parenteses_direito  entao
+                           comandos  senao_comandos  fimse  ponto_virgula
+        | {avalie}   T.avalie  T.parenteses_esquerdo  expressao parenteses_direito  caso_comandos
+                               senao_comandos  fimavalie  ponto_virgula
+        | {enquanto} T.enquanto  parenteses_esquerdo  exp_logica  parenteses_direito  faca
+                                 comandos  fimenquanto  ponto_virgula
+        | {repita}   T.repita  comandos  ate  parenteses_esquerdo  exp_logica  parenteses_direito
+                               ponto_virgula
+        | {para}     T.para  variavel  de  [left]:num_inteiro  ate  [right]:num_inteiro  faca
+                             comandos  fimpara  ponto_virgula
+        | {para_seg} T.para  variavel  de  [left]:num_inteiro  passo  num_inteiro  ate
+                             [right]:num_inteiro  faca  comandos  fimpara  ponto_virgula;
+    
+    comandos = {comando_unitario} comando ponto_virgula 
+                | {comandos} comando ponto_virgula comandos;
+    senao_comandos = senao comando;
+    caso_comandos = {caso} caso valor dois_pontos comando ponto_virgula
+                    |{casos} caso valor dois_pontos comando caso_comandos ;
+    
+    expressao = {termo} termo 
+                | {somar} expressao somar termo 
+                | {subtrair} expressao subtrair termo;
+                
+    termo = {fator} fator
+            | {multiplicar} termo multiplicar  fator
+            | {dividir} termo dividir fator; 
+            
+    fator = {num_inteiro} num_inteiro 
+            | {num_real} num_real 
+            | {expressao} parenteses_esquerdo expressao parenteses_direito;
+    
+                
+    exp_logica = {operacao_logica} exp_logica sinal_bool termo_logico 
+                |{operador_logico} termo_logico;
+        
+    termo_logico = {unidade_logica} variavel
+                  |{expressao_logica} parenteses_direito exp_logica parenteses_esquerdo;
+    
+    sinal_bool = 
+         {maior}     maior        
+        |{menor}     menor         
+        |{maior_ig}     maior_igual 
+        |{menor_ig}     menor_igual 
+        |{not}          nao        
+        |{e}          e            
+        |{ou}          ou            
+        |{igualdade} igualdade    
+        |{diferente} diferente;    
+
