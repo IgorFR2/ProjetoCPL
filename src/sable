@@ -55,7 +55,7 @@ Tokens
     dois_pontos         = ':';
     virgula             = ',';
     underline           = '_';
-    atribuir            = '<-';
+    atribuir            = ':=';
     tab                 = ctab;
     enter               = cr | nl | cr nl;
     espaco              = ' ';
@@ -80,7 +80,7 @@ Tokens
     nao         = '!';
     e           = 'e';
     ou          = '|';
-    igualdade   = '==';
+    igualdade   = '=';
     diferente   = '<>';
     
     // Palavras reservadas
@@ -107,6 +107,7 @@ Tokens
     falso         = bool_false;
     escreva        = 'escreva';
     leia        = 'leia';
+    const = 'const';
     id             = ('_'|letra)(char|'_')*;
     tipos_dados    = tipos_dados;
     caracter     = '''todos''';
@@ -144,7 +145,8 @@ Productions
     // OBS.: com essas producoes, se faz necessario ter pelo menos uma declaracao
     declaracoes = {declaracao} P.declaracao  P.declaracoes
                   | {fim_declaracao} ;
-    declaracao = P.tipos_dados  T.dois_pontos  P.variaveis  T.ponto_virgula;
+    declaracao = P.tipos_dados  T.dois_pontos  P.variaveis  T.ponto_virgula
+               | {constante} T.const  T.id  P.valor  T.ponto_virgula;
     tipos_dados = {inteiro} T.inteiro | {real} T.real | {caractere} T.t_caractere;
     variaveis = {variavel} P.variavel | {variaveis} P.variavel  T.virgula  P.variaveis;
     variavel = {nome} T.id | {vetor} T.id  T.colchete_esquerdo  T.num_inteiro  T.colchete_direito ;
@@ -182,7 +184,8 @@ Productions
             | {dividir} termo dividir fator; 
             
     fator = {num_inteiro} num_inteiro 
-            | {num_real} num_real 
+            | {num_real} num_real
+            | {id} T.id
             | {expressao} parenteses_esquerdo expressao parenteses_direito;
     
                 
@@ -190,7 +193,7 @@ Productions
                 |{operador_logico} termo_logico;
         
     termo_logico = {unidade_logica} variavel
-                  |{expressao_logica} parenteses_direito exp_logica parenteses_esquerdo;
+                  |{expressao_logica} parenteses_esquerdo exp_logica parenteses_direito;
     
     sinal_bool = 
          {maior}     maior        
