@@ -1,4 +1,4 @@
-{{programa primeiro
+programa primeiro
 inicio
 	inteiro : a , b , c ;
 	real : r  ,  s  ,  p 
@@ -7,9 +7,9 @@ inicio
 , g
 , h
 ;
-	se(a=b e nao(c=a) ou r <> s){
+	se(a=b e nao(c=a) ou r <> s) entao
 		leia(f)     ;
-	}
+	fim se;
 	a <- 1;
 	b <- 2;
 	c < a + b;
