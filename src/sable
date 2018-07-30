@@ -5,6 +5,11 @@ ConfiguraÃ§Ãµes do sable no linux:
 - Location: /usr/lib/jvm/java-8-openjdk/jre/bin/java
 - Working Directory: ${container_loc}
 - Arguments: -classpath /home/igorfr2/Desktop/sablecc-3.2/lib/sablecc.jar org.sablecc.sablecc.SableCC ${resource_name}
+
+Coisas pendentes:
+- Verificar expressão -> expressão lógica
+ 
+
 */
 
 Package compilador ;
@@ -83,46 +88,47 @@ Tokens
     igualdade   = '=';
     diferente   = '<>';
     
+    //  Conectores
+    de      = 'de';
+    ate     = 'ate';
+    passo   = 'passo';
+    faca    = 'faca'; 
+
     // Palavras reservadas
     //reservada  = word;
     real         = 'real';
     inteiro      = 'inteiro';
-    t_caractere = 'caractere';
+    t_caractere  = 'caractere';
     num_real     = digito digito* ',' digito digito*;
-    num_inteiro = digito*; 
-    se             = 'se'; 
+    num_inteiro  = digito*; 
+    se           = 'se'; 
     entao        = 'entao';
     senao        = 'senao';
-    fimse        = 'fim se.';
-    fimsenao    = 'fim senao.';
+    fimse        = 'fim se';
+    fimsenao	 = 'fim senao';
     enquanto     = 'enquanto';
-    fimenquanto    = 'fim enquanto';
+    fimenquanto  = 'fim enquanto';
     para         = 'para';
-    fimpara        = 'fim para';
-    repita        = 'repita';
-    avalie         = 'avalie';    //<= o switch
+    fimpara      = 'fim para';
+    repita       = 'repita';
+    avalie       = 'avalie';    //<= o switch
     fimavalie    = 'fim avalie';
     caso         = 'caso';    // <= o case
-    verdadeiro     = bool_true;
-    falso         = bool_false;
-    escreva        = 'escreva';
-    leia        = 'leia';
-    const = 'const';
-    id             = ('_'|letra)(char|'_')*;
-    tipos_dados    = tipos_dados;
+    verdadeiro   = bool_true;
+    falso      	 = bool_false;
+    escreva      = 'escreva';
+    leia       	 = 'leia';
+    const 		 = 'const';
+    tipos_dados  = tipos_dados;
     caracter     = '''todos''';
+    //vetor            	= tipo col id col_e tamanho col_d semi <= type:id[tam];
+    vetor               = tipos_dados':'sp? nome'['digito*'];';
+    vetor_error         = tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
+    vetor_string        = tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
+    vetor_string_error  = tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
+    id           = ('_'|letra)(char|'_')*;
     
-    //  Conectores
-    de        = 'de';
-    ate        = 'ate';
-    passo    = 'passo';
-    faca    = 'faca'; 
 
-    //vetor             = tipo col id col_e tamanho col_d semi <= type:id[tam];
-    vetor                 = tipos_dados':'sp? nome'['digito*'];';
-    vetor_error            = tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
-    vetor_string         = tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
-    vetor_string_error    = tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
 
     // Comentarios
     comentario_linear = cmt_linha;
@@ -135,7 +141,7 @@ Tokens
 
 
 Ignored Tokens
-    enter, espaco, tab, comentario_fim_erro;
+    enter, espaco, tab, comentario_fim_erro, comentario;
 
 
 Productions 
@@ -146,7 +152,7 @@ Productions
     declaracoes = {declaracao} P.declaracao  P.declaracoes
                   | {fim_declaracao} ;
     declaracao = P.tipos_dados  T.dois_pontos  P.variaveis  T.ponto_virgula
-               | {constante} T.const  T.id  P.valor  T.ponto_virgula;
+               | {constante} T.const  T.id P.valor  T.ponto_virgula;
     tipos_dados = {inteiro} T.inteiro | {real} T.real | {caractere} T.t_caractere;
     variaveis = {variavel} P.variavel | {variaveis} P.variavel  T.virgula  P.variaveis;
     variavel = {nome} T.id | {vetor} T.id  T.colchete_esquerdo  T.num_inteiro  T.colchete_direito ;
@@ -157,10 +163,10 @@ Productions
         | {leitura}  T.leia  parenteses_esquerdo variavel parenteses_direito ponto_virgula
         | {escrita}  T.escreva  parenteses_esquerdo expressao parenteses_direito ponto_virgula
         | {se}       T.se  T.parenteses_esquerdo  exp_logica  T.parenteses_direito  entao
-                           comandos  senao_comandos  fimse  ponto_virgula
+                           se_corpo  fimse  ponto_virgula
         | {avalie}   T.avalie  T.parenteses_esquerdo  expressao parenteses_direito  caso_comandos
-                               senao_comandos  fimavalie  ponto_virgula
-        | {enquanto} T.enquanto  parenteses_esquerdo  exp_logica  parenteses_direito  faca
+                               senao comandos  fimavalie  ponto_virgula
+        | {enquanto} T.enquanto  parenteses_esquerdo  exp_logica  parenteses_direito faca
                                  comandos  fimenquanto  ponto_virgula
         | {repita}   T.repita  comandos  ate  parenteses_esquerdo  exp_logica  parenteses_direito
                                ponto_virgula
@@ -169,10 +175,13 @@ Productions
         | {para_seg} T.para  variavel  de  [left]:num_inteiro  passo  num_inteiro  ate
                              [right]:num_inteiro  faca  comandos  fimpara  ponto_virgula;
     
-    comandos = {comando_unitario} comando ponto_virgula 
-                | {comandos} comando ponto_virgula comandos;
-    senao_comandos = senao comando;
-    caso_comandos = {caso} caso valor dois_pontos comando ponto_virgula
+    comandos = {comando_unitario} comando  
+                | {comandos} comando comandos;
+    se_corpo = comando se_corpo
+    		|{se_senao} comando senao comandos
+    		|{se_unico} comando;
+    		
+    caso_comandos = {caso} caso valor dois_pontos comando 
                     |{casos} caso valor dois_pontos comando caso_comandos ;
     
     expressao = {termo} termo 
@@ -198,11 +207,11 @@ Productions
     sinal_bool = 
          {maior}     maior        
         |{menor}     menor         
-        |{maior_ig}     maior_igual 
-        |{menor_ig}     menor_igual 
-        |{not}          nao        
-        |{e}          e            
-        |{ou}          ou            
+        |{maior_ig}  maior_igual 
+        |{menor_ig}  menor_igual 
+        |{not}       nao        
+        |{e}         e            
+        |{ou}        ou            
         |{igualdade} igualdade    
         |{diferente} diferente;    
 
