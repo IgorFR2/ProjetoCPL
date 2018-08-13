@@ -105,7 +105,7 @@ Tokens
     entao        = 'entao';
     senao        = 'senao';
     fimse        = 'fim se';
-    fimsenao	 = 'fim senao';
+    fimsenao     = 'fim senao';
     enquanto     = 'enquanto';
     fimenquanto  = 'fim enquanto';
     para         = 'para';
@@ -115,13 +115,13 @@ Tokens
     fimavalie    = 'fim avalie';
     caso         = 'caso';    // <= o case
     verdadeiro   = bool_true;
-    falso      	 = bool_false;
+    falso        = bool_false;
     escreva      = 'escreva';
-    leia       	 = 'leia';
-    const 		 = 'const';
+    leia         = 'leia';
+    const        = 'const';
     tipos_dados  = tipos_dados;
     caracter     = '''todos''';
-    //vetor            	= tipo col id col_e tamanho col_d semi <= type:id[tam];
+    //vetor             = tipo col id col_e tamanho col_d semi <= type:id[tam];
     vetor               = tipos_dados':'sp? nome'['digito*'];';
     vetor_error         = tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
     vetor_string        = tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
@@ -159,60 +159,62 @@ Productions
     valor = {val_caractere} T.vetor_string | {val_inteiro} T.num_inteiro | {val_real} T.num_real;
     
     comando = {atribuicao} P.variavel  T.atribuir  P.expressao  T.ponto_virgula
-        | {leitura}  T.leia  parenteses_esquerdo P.variavel parenteses_direito ponto_virgula
-        | {escrita}  T.escreva  parenteses_esquerdo expressao parenteses_direito ponto_virgula
-        | {se}       T.se  T.parenteses_esquerdo  expressao  T.parenteses_direito  entao
-                           se_corpo  fimse  ponto_virgula
-        | {avalie}   T.avalie  T.parenteses_esquerdo  expressao parenteses_direito  caso_comandos
-                               senao P.comandos  fimavalie  ponto_virgula
-        | {enquanto} T.enquanto  parenteses_esquerdo  expressao  parenteses_direito faca
-                                 P.comandos  fimenquanto  ponto_virgula
-        | {repita}   T.repita  P.comandos  ate  parenteses_esquerdo  expressao  parenteses_direito
-                               ponto_virgula
-        | {para}     T.para  P.variavel  de  [left]:num_inteiro  ate  [right]:num_inteiro  faca
-                             P.comandos  fimpara  ponto_virgula
-        | {para_seg} T.para  P.variavel  de  [left]:num_inteiro  passo  num_inteiro  ate
-                             [right]:num_inteiro  faca  P.comandos  fimpara  ponto_virgula;
+            | {leitura}  T.leia  T.parenteses_esquerdo  P.variavel  T.parenteses_direito
+                         T.ponto_virgula
+            | {escrita}  T.escreva  T.parenteses_esquerdo  P.expressao  T.parenteses_direito
+                         T.ponto_virgula
+            | {se}       T.se  T.parenteses_esquerdo  P.expressao  T.parenteses_direito  entao
+                         P.se_corpo  T.fimse  T.ponto_virgula
+            | {avalie}   T.avalie  T.parenteses_esquerdo  P.expressao parenteses_direito
+                         P.caso_comandos  T.senao  P.comandos  T.fimavalie  T.ponto_virgula
+            | {enquanto} T.enquanto  T.parenteses_esquerdo  P.expressao  T.parenteses_direito
+                         T.faca  P.comandos  T.fimenquanto  T.ponto_virgula
+            | {repita}   T.repita  P.comandos  T.ate  T.parenteses_esquerdo  P.expressao
+                         T. parenteses_direito  T.ponto_virgula
+            | {para}     T.para  P.variavel  T.de  [left]:T.num_inteiro  T.ate
+                         [right]:T.num_inteiro  T.faca P.comandos  T.fimpara  T.ponto_virgula
+            | {para_seg} T.para  P.variavel  T.de  [left]:T.num_inteiro  T.passo  T.num_inteiro
+                         T.ate  [right]:T.num_inteiro  T.faca  P.comandos  T.fimpara
+                         T.ponto_virgula;
     
     comandos = {comando_unitario} P.comando
-                | {comandos} P.comando P.comandos;
-    se_corpo = P.comando P.se_corpo
-    		|{se_senao} P.comando senao P.comandos
-    		|{se_unico} P.comando;
-    		
-    caso_comandos = {caso} caso P.valor dois_pontos P.comando
-                    |{casos} caso P.valor dois_pontos P.comando P.caso_comandos ;
+             | {comandos} P.comando  P.comandos;
+    se_corpo = P.comando  P.se_corpo
+             | {se_senao} P.comando  T.senao  P.comandos
+             | {se_unico} P.comando;
+            
+    caso_comandos = {caso} T.caso  P.valor  T.dois_pontos  P.comando
+                  | {casos} T.caso  P.valor  T.dois_pontos  P.comando  P.caso_comandos;
     
     expressao = {termo} P.termo
-                | {somar} P.expressao somar P.termo
-                | {subtrair} P.expressao subtrair P.termo
-    			|{exp_booleana} P.expressao P.exp_logica;
+              | {somar} P.expressao  T.somar  P.termo
+              | {subtrair} P.expressao  T.subtrair  P.termo
+              | {exp_booleana} P.expressao  P.exp_logica;
                 
 
     termo = {fator} P.fator
-            | {multiplicar} P.termo multiplicar  P.fator
-            | {dividir} P.termo dividir P.fator;
+          | {multiplicar} P.termo  T.multiplicar  P.fator
+          | {dividir} P.termo  T.dividir  P.fator;
             
-    fator = {num_inteiro} num_inteiro 
-            | {num_real} num_real
-            | {id} T.id
-            | {expressao} parenteses_esquerdo P.expressao parenteses_direito;
+    fator = {num_inteiro} T.num_inteiro
+          | {num_real} T.num_real
+          | {id} T.id
+          | {expressao} T.parenteses_esquerdo  P.expressao  T.parenteses_direito;
     
                 
-    exp_logica = {operacao_logica} P.exp_logica P.sinal_bool P.termo_logico
-                |{operador_logico} P.termo_logico;
+    exp_logica = {operacao_logica} P.exp_logica  P.sinal_bool  P.termo_logico
+               | {operador_logico} P.termo_logico;
         
     termo_logico = {unidade_logica} P.variavel
-                  |{expressao_logica} parenteses_esquerdo P.exp_logica parenteses_direito;
+                 | {expressao_logica} T.parenteses_esquerdo  P.exp_logica  T.parenteses_direito;
     
-    sinal_bool = 
-         {maior}     maior        
-        |{menor}     menor         
-        |{maior_ig}  maior_igual 
-        |{menor_ig}  menor_igual 
-        |{not}       nao        
-        |{e}         e            
-        |{ou}        ou            
-        |{igualdade} igualdade    
-        |{diferente} diferente;    
+    sinal_bool = {maior}     T.maior
+               | {menor}     T.menor
+               | {maior_ig}  T.maior_igual
+               | {menor_ig}  T.menor_igual
+               | {not}       T.nao
+               | {e}         T.e
+               | {ou}        T.ou
+               | {igualdade} T.igualdade
+               | {diferente} T.diferente;
 
