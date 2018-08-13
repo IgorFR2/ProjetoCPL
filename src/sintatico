@@ -1,0 +1,60 @@
+programa = T.id  P.declaracoes  P.comando*;
+
+declaracoes = {declaracao} P.declaracao  P.declaracoes
+            | {fim_declaracao} ;
+declaracao = P.tipos_dados  P.variaveis
+           | {constante} T.id P.valor;
+tipos_dados = {inteiro} T.inteiro | {real} T.real | {caractere} T.t_caractere;
+variaveis = {variavel} P.variavel | {variaveis} P.variavel  P.variaveis;
+variavel = {nome} T.id | {vetor} T.id  T.num_inteiro ;
+
+valor = {val_caractere} T.vetor_string | {val_inteiro} T.num_inteiro | {val_real} T.num_real;
+
+comando = {atribuicao} P.variavel  P.expressao
+        | {leitura}  P.variavel
+        | {escrita}  P.expressao
+        | {se}       P.expressao  P.se_corpo
+        | {avalie}   P.expressao  P.caso_comandos  P.comandos
+        | {enquanto} P.expressao  P.comandos
+        | {repita}   P.comandos  P.expressao
+        | {para}     P.variavel  [left]:T.num_inteiro  [right]:T.num_inteiro  P.comandos
+        | {para_seg} P.variavel  [left]:T.num_inteiro  T.num_inteiro  [right]:T.num_inteiro  P.comandos;
+
+comandos = {comando_unitario} P.comando
+         | {comandos} P.comando  P.comandos;
+se_corpo = P.comando  P.se_corpo
+         | {se_senao} P.comando  P.comandos
+         | {se_unico} P.comando;
+
+caso_comandos = {caso} P.valor  P.comando
+              | {casos} P.valor  P.comando  P.caso_comandos;
+
+expressao = {termo} P.termo
+          | {somar} P.expressao  P.termo
+          | {subtrair} P.expressao  P.termo
+          | {exp_booleana} P.expressao  P.exp_logica;
+
+
+termo = {fator} P.fator
+      | {multiplicar} P.termo  P.fator
+      | {dividir} P.termo  P.fator;
+
+fator = {num_inteiro} T.num_inteiro
+      | {num_real} T.num_real
+      | {id} T.id
+      | {expressao} P.expressao;
+
+
+exp_logica =   {maior}     P.exp_logica  P.termo_logico
+             | {menor}     P.exp_logica  P.termo_logico
+             | {maior_ig}  P.exp_logica  P.termo_logico
+             | {menor_ig}  P.exp_logica  P.termo_logico
+             | {not}       P.exp_logica  P.termo_logico
+             | {e}         P.exp_logica  P.termo_logico
+             | {ou}        P.exp_logica  P.termo_logico
+             | {igualdade} P.exp_logica  P.termo_logico
+             | {diferente} P.exp_logica  P.termo_logico
+             | {operador_logico} P.termo_logico;
+
+termo_logico = {unidade_logica} P.variavel
+             | {expressao_logica} P.exp_logica;
