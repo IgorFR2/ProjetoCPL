@@ -8,8 +8,6 @@ Configuracoes do sable no linux:
 
 Coisas pendentes:
 - Verificar expressao -> expressao logica
- 
-
 */
 
 Package compilador ;
@@ -126,9 +124,7 @@ Tokens
     vetor_error         = tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
     vetor_string        = tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
     vetor_string_error  = tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
-    id           = ('_'|letra)(char|'_')*;
-    
-
+    id                  = ('_'|letra)(char|'_')*;
 
     // Comentarios
     comentario_linear = cmt_linha;
@@ -201,20 +197,18 @@ Productions
           | {id} T.id
           | {expressao} T.parenteses_esquerdo  P.expressao  T.parenteses_direito;
     
-                
-    exp_logica = {operacao_logica} P.exp_logica  P.sinal_bool  P.termo_logico
+    exp_logica = {maior}     P.exp_logica  T.maior  P.termo_logico
+               | {menor}     P.exp_logica  T.menor  P.termo_logico
+               | {maior_ig}  P.exp_logica  T.maior_igual  P.termo_logico
+               | {menor_ig}  P.exp_logica  T.menor_igual  P.termo_logico
+               | {not}       T.nao  P.termo_logico
+               | {e}         P.exp_logica  T.e  P.termo_logico
+               | {ou}        P.exp_logica  T.ou  P.termo_logico
+               | {igualdade} P.exp_logica  T.igualdade  P.termo_logico
+               | {diferente} P.exp_logica  T.diferente  P.termo_logico
                | {operador_logico} P.termo_logico;
+
         
     termo_logico = {unidade_logica} P.variavel
                  | {expressao_logica} T.parenteses_esquerdo  P.exp_logica  T.parenteses_direito;
-    
-    sinal_bool = {maior}     T.maior
-               | {menor}     T.menor
-               | {maior_ig}  T.maior_igual
-               | {menor_ig}  T.menor_igual
-               | {not}       T.nao
-               | {e}         T.e
-               | {ou}        T.ou
-               | {igualdade} T.igualdade
-               | {diferente} T.diferente;
 
