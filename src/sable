@@ -83,6 +83,7 @@ Tokens
     nao         = '!';
     e           = 'e';
     ou          = '|';
+    xor         = '^';
     igualdade   = '=';
     diferente   = '<>';
     
@@ -186,29 +187,26 @@ Productions
               | {somar} P.expressao  T.somar  P.termo
               | {subtrair} P.expressao  T.subtrair  P.termo
               | {exp_booleana} P.expressao  P.exp_logica;
-                
 
     termo = {fator} P.fator
           | {multiplicar} P.termo  T.multiplicar  P.fator
           | {dividir} P.termo  T.dividir  P.fator;
             
-    fator = {num_inteiro} T.num_inteiro
-          | {num_real} T.num_real
-          | {id} T.id
+    fator = {valor} P.valor
+          | {variavel} P.variavel
           | {expressao} T.parenteses_esquerdo  P.expressao  T.parenteses_direito;
     
-    exp_logica = {maior}     P.exp_logica  T.maior  P.termo_logico
-               | {menor}     P.exp_logica  T.menor  P.termo_logico
-               | {maior_ig}  P.exp_logica  T.maior_igual  P.termo_logico
+    exp_logica = {igualdade} P.exp_logica  T.igualdade  P.termo_logico
+               | {diferente} P.exp_logica  T.diferente  P.termo_logico
                | {menor_ig}  P.exp_logica  T.menor_igual  P.termo_logico
+               | {maior_ig}  P.exp_logica  T.maior_igual  P.termo_logico
+               | {menor}     P.exp_logica  T.menor  P.termo_logico
+               | {maior}     P.exp_logica  T.maior  P.termo_logico
                | {not}       T.nao  P.termo_logico
                | {e}         P.exp_logica  T.e  P.termo_logico
                | {ou}        P.exp_logica  T.ou  P.termo_logico
-               | {igualdade} P.exp_logica  T.igualdade  P.termo_logico
-               | {diferente} P.exp_logica  T.diferente  P.termo_logico
+               | {xor}        P.exp_logica  T.xor  P.termo_logico
                | {operador_logico} P.termo_logico;
-
         
     termo_logico = {unidade_logica} P.variavel
                  | {expressao_logica} T.parenteses_esquerdo  P.exp_logica  T.parenteses_direito;
-
