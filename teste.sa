@@ -5,6 +5,7 @@ inicio
 	caractere: f, g, h;
 	const a 10;
 	
+	/* a := 3 - -1; */
 	a := 1;
 	b := a;
 	leia(c);
@@ -23,9 +24,9 @@ inicio
 fim.
 
 /*
-	Arrumar "comentario linear", provavelmente falta a mudança de estado (normal->comentario)
+	Arrumar "comentario linear", provavelmente falta a mudanca de estado (normal->comentario)
 	Arrumar Exp e Exp booleanos
-		declaração
+		declaracao
 	OK) tipo: a,b,c;
 	OK) const a X;
 	
@@ -34,7 +35,7 @@ fim.
 	OK) leia ( .. );
 	OK) escreva ( .. );
 	
-	(Adicionar Se sem Senão!)
+	(Adicionar Se sem Senao!)
 	OK) se ( .. ) entao fim se; 
 	OK) avalie ( .. ) caso valor: .. caso valor: .. senao: .. fim avalie;
 	OK) enquanto ( .. ) faca .. fim enquanto;
