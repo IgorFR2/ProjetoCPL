@@ -194,7 +194,7 @@ Productions
 
     fator = {valor} P.valor
           | {variavel} P.variavel
-          | {inversao} T.subtrair  P.expressao
+          //| {inversao} T.subtrair  P.expressao
           | {expressao} T.parenteses_esquerdo  P.expressao  T.parenteses_direito;
 
     exp_logica = {igualdade} T.igualdade  P.exp_logica
