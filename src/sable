@@ -99,8 +99,8 @@ Tokens
     inteiro      = 'inteiro';
     t_caractere  = 'caractere';
     num_real     = digito digito* ',' digito digito*;
-    num_inteiro  = digito*; 
-    se           = 'se'; 
+    num_inteiro  = digito*;
+    se           = 'se';
     entao        = 'entao';
     senao        = 'senao';
     fimse        = 'fim se';
@@ -143,21 +143,14 @@ Ignored Tokens
 
 Productions
 
-    inicio
-         {-> P.inicio  } =
-
-     {programa} P.programa
-         {-> New inicio.programa (P.programa  )  }
-     ;
-
     programa
          {-> P.programa  } =
 
      {acorpoprograma1} T.programa T.id T.inicio P.declaracoes T.fim
-         {-> New programa.corpo (T.programa , T.id , T.inicio , P.declaracoes , [  ], T.fim  )  }   |
+         {-> New programa.corpo (T.id , P.declaracoes , [  ])  }   |
 
      {acorpoprograma2} T.programa T.id T.inicio P.declaracoes P.cmd T.fim
-         {-> New programa.corpo (T.programa , T.id , T.inicio , P.declaracoes , [ P.cmd.comando  ], T.fim  )  }
+         {-> New programa.corpo (T.id , P.declaracoes , [ P.cmd.comando  ])  }
      ;
 
     declaracoes
@@ -174,10 +167,10 @@ Productions
          {-> P.declaracao  } =
 
      P.tipos_dados T.dois_pontos P.variaveis T.ponto_virgula
-         {-> New declaracao (P.tipos_dados , T.dois_pontos , P.variaveis , T.ponto_virgula  )  }   |
+         {-> New declaracao (P.tipos_dados , P.variaveis)  }   |
 
      {constante} T.const T.id P.valor T.ponto_virgula
-         {-> New declaracao.constante (T.const , T.id , P.valor , T.ponto_virgula  )  }
+         {-> New declaracao.constante (T.id , P.valor)  }
      ;
 
     tipos_dados
@@ -200,7 +193,7 @@ Productions
          {-> New variaveis.variavel (P.variavel  )  }   |
 
      {variaveis} P.variavel T.virgula P.variaveis
-         {-> New variaveis.variaveis (P.variavel , T.virgula , P.variaveis  )  }
+         {-> New variaveis.variaveis (P.variavel , P.variaveis  )  }
      ;
 
     variavel
@@ -210,7 +203,7 @@ Productions
          {-> New variavel.nome (T.id  )  }   |
 
      {vetor} T.id T.colchete_esquerdo T.num_inteiro T.colchete_direito
-         {-> New variavel.vetor (T.id , T.colchete_esquerdo , T.num_inteiro , T.colchete_direito  )  }
+         {-> New variavel.vetor (T.id , T.num_inteiro)  }
      ;
 
     valor
@@ -230,19 +223,19 @@ Productions
          {-> P.comando  } =
 
      {atribuicao} P.variavel T.atribuir P.expressao T.ponto_virgula
-         {-> New comando.atribuicao (P.variavel , T.atribuir , P.expressao , T.ponto_virgula  )  }   |
+         {-> New comando.atribuicao (P.variavel , P.expressao)  }   |
 
      {leitura} T.leia T.parenteses_esquerdo P.variavel T.parenteses_direito T.ponto_virgula
-         {-> New comando.leitura (T.leia , T.parenteses_esquerdo , P.variavel , T.parenteses_direito , T.ponto_virgula  )  }   |
+         {-> New comando.leitura (P.variavel)  }   |
 
      {escrita} T.escreva T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula
-         {-> New comando.escrita (T.escreva , T.parenteses_esquerdo , P.expressao , T.parenteses_direito , T.ponto_virgula  )  }   |
+         {-> New comando.escrita (P.expressao)  }   |
 
      {se} T.se T.parenteses_esquerdo P.expressao T.parenteses_direito T.entao P.se_corpo T.fimse T.ponto_virgula
-         {-> New comando.se (T.se , T.parenteses_esquerdo , P.expressao , T.parenteses_direito , T.entao , P.se_corpo , T.fimse , T.ponto_virgula  )  }   |
+         {-> New comando.se (P.expressao , P.se_corpo)  }   |
 
      {avalie} T.avalie T.parenteses_esquerdo P.expressao T.parenteses_direito P.caso_comandos T.senao P.comandos T.fimavalie T.ponto_virgula
-         {-> New comando.avalie (T.avalie , T.parenteses_esquerdo , P.expressao , T.parenteses_direito , P.caso_comandos , T.senao , P.comandos , T.fimavalie , T.ponto_virgula  )  }   |
+         {-> New comando.avalie (P.expressao , P.caso_comandos , P.comandos)  }   |
 
      {enquanto} T.enquanto T.parenteses_esquerdo P.expressao T.parenteses_direito T.faca P.comandos T.fimenquanto T.ponto_virgula
          {-> New comando.enquanto (T.enquanto , T.parenteses_esquerdo , P.expressao , T.parenteses_direito , T.faca , P.comandos , T.fimenquanto , T.ponto_virgula  )  }   |
@@ -380,12 +373,8 @@ Productions
      ;
 
 Abstract Syntax Tree
-    inicio =
-     {programa} P.programa
-     ;
-
     programa =
-     {corpo} T.programa T.id T.inicio P.declaracoes P.comando* T.fim
+     {corpo} T.id P.declaracoes P.comando*
      ;
 
     declaracoes =
@@ -394,8 +383,8 @@ Abstract Syntax Tree
      ;
 
     declaracao =
-     P.tipos_dados T.dois_pontos P.variaveis T.ponto_virgula |
-     {constante} T.const T.id P.valor T.ponto_virgula
+     P.tipos_dados P.variaveis |
+     {constante} T.id P.valor
      ;
 
     tipos_dados =
@@ -406,12 +395,12 @@ Abstract Syntax Tree
 
     variaveis =
      {variavel} P.variavel |
-     {variaveis} P.variavel T.virgula P.variaveis
+     {variaveis} P.variavel P.variaveis
      ;
 
     variavel =
      {nome} T.id |
-     {vetor} T.id T.colchete_esquerdo T.num_inteiro T.colchete_direito
+     {vetor} T.id T.num_inteiro
      ;
 
     valor =
@@ -421,11 +410,11 @@ Abstract Syntax Tree
      ;
 
     comando =
-     {atribuicao} P.variavel T.atribuir P.expressao T.ponto_virgula |
-     {leitura} T.leia T.parenteses_esquerdo P.variavel T.parenteses_direito T.ponto_virgula |
-     {escrita} T.escreva T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula |
-     {se} T.se T.parenteses_esquerdo P.expressao T.parenteses_direito T.entao P.se_corpo T.fimse T.ponto_virgula |
-     {avalie} T.avalie T.parenteses_esquerdo P.expressao T.parenteses_direito P.caso_comandos T.senao P.comandos T.fimavalie T.ponto_virgula |
+     {atribuicao} P.variavel P.expressao |
+     {leitura} P.variavel |
+     {escrita} P.expressao |
+     {se} P.expressao P.se_corpo |
+     {avalie} P.expressao P.caso_comandos P.comandos |
      {enquanto} T.enquanto T.parenteses_esquerdo P.expressao T.parenteses_direito T.faca P.comandos T.fimenquanto T.ponto_virgula |
      {repita} T.repita P.comandos T.ate T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula |
      {para} T.para P.variavel T.de [left]: T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula |
