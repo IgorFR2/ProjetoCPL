@@ -223,31 +223,31 @@ Productions
          {-> P.comando  } =
 
      {atribuicao} P.variavel T.atribuir P.expressao T.ponto_virgula
-         {-> New comando.atribuicao (P.variavel , P.expressao)  }   |
+         {-> New comando.atribuicao (P.variavel , P.expressao  )  }   |
 
      {leitura} T.leia T.parenteses_esquerdo P.variavel T.parenteses_direito T.ponto_virgula
-         {-> New comando.leitura (P.variavel)  }   |
+         {-> New comando.leitura (P.variavel  )  }   |
 
      {escrita} T.escreva T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula
-         {-> New comando.escrita (P.expressao)  }   |
+         {-> New comando.escrita (P.expressao  )  }   |
 
      {se} T.se T.parenteses_esquerdo P.expressao T.parenteses_direito T.entao P.se_corpo T.fimse T.ponto_virgula
-         {-> New comando.se (P.expressao , P.se_corpo)  }   |
+         {-> New comando.se (P.expressao , P.se_corpo  )  }   |
 
      {avalie} T.avalie T.parenteses_esquerdo P.expressao T.parenteses_direito P.caso_comandos T.senao P.comandos T.fimavalie T.ponto_virgula
-         {-> New comando.avalie (P.expressao , P.caso_comandos , P.comandos)  }   |
+         {-> New comando.avalie (P.expressao , P.caso_comandos , P.comandos  )  }   |
 
      {enquanto} T.enquanto T.parenteses_esquerdo P.expressao T.parenteses_direito T.faca P.comandos T.fimenquanto T.ponto_virgula
-         {-> New comando.enquanto (T.enquanto , T.parenteses_esquerdo , P.expressao , T.parenteses_direito , T.faca , P.comandos , T.fimenquanto , T.ponto_virgula  )  }   |
+         {-> New comando.enquanto (P.expressao , P.comandos  )  }   |
 
      {repita} T.repita P.comandos T.ate T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula
-         {-> New comando.repita (T.repita , P.comandos , T.ate , T.parenteses_esquerdo , P.expressao , T.parenteses_direito , T.ponto_virgula  )  }   |
+         {-> New comando.repita (P.comandos , P.expressao  )  }   |
 
      {para} T.para P.variavel T.de [left]: T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula
-         {-> New comando.para (T.para , P.variavel , T.de , left , T.ate , right , T.faca , P.comandos , T.fimpara , T.ponto_virgula  )  }   |
+         {-> New comando.para (P.variavel , left , right , P.comandos  )  }   |
 
      {para_seg} T.para P.variavel T.de [left]: T.num_inteiro T.passo T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula
-         {-> New comando.para_seg (T.para , P.variavel , T.de , left , T.passo , T.num_inteiro , T.ate , right , T.faca , P.comandos , T.fimpara , T.ponto_virgula  )  }
+         {-> New comando.para_seg (P.variavel , left , T.num_inteiro , right , P.comandos  )  }
      ;
 
     comandos
@@ -267,7 +267,7 @@ Productions
          {-> New se_corpo (P.comando , P.se_corpo  )  }   |
 
      {se_senao} P.comando T.senao P.comandos
-         {-> New se_corpo.se_senao (P.comando , T.senao , P.comandos  )  }   |
+         {-> New se_corpo.se_senao (P.comando , P.comandos  )  }   |
 
      {se_unico} P.comando
          {-> New se_corpo.se_unico (P.comando  )  }
@@ -277,10 +277,10 @@ Productions
          {-> P.caso_comandos  } =
 
      {caso} T.caso P.valor T.dois_pontos P.comando
-         {-> New caso_comandos.caso (T.caso , P.valor , T.dois_pontos , P.comando  )  }   |
+         {-> New caso_comandos.caso (P.valor , P.comando  )  }   |
 
      {casos} T.caso P.valor T.dois_pontos P.comando P.caso_comandos
-         {-> New caso_comandos.casos (T.caso , P.valor , T.dois_pontos , P.comando , P.caso_comandos  )  }
+         {-> New caso_comandos.casos (P.valor , P.comando , P.caso_comandos  )  }
      ;
 
     expressao
@@ -290,10 +290,10 @@ Productions
          {-> New expressao.termo (P.termo  )  }   |
 
      {somar} P.expressao T.somar P.termo
-         {-> New expressao.somar (P.expressao , T.somar , P.termo  )  }   |
+         {-> New expressao.somar (P.expressao , P.termo  )  }   |
 
      {subtrair} P.expressao T.subtrair P.termo
-         {-> New expressao.subtrair (P.expressao , T.subtrair , P.termo  )  }   |
+         {-> New expressao.subtrair (P.expressao , P.termo  )  }   |
 
      {exp_logica} P.expressao P.exp_logica
          {-> New expressao.exp_logica (P.expressao , P.exp_logica  )  }
@@ -306,10 +306,10 @@ Productions
          {-> New termo.fator (P.fator  )  }   |
 
      {multiplicar} P.termo T.multiplicar P.fator
-         {-> New termo.multiplicar (P.termo , T.multiplicar , P.fator  )  }   |
+         {-> New termo.multiplicar (P.termo , P.fator  )  }   |
 
      {dividir} P.termo T.dividir P.fator
-         {-> New termo.dividir (P.termo , T.dividir , P.fator  )  }
+         {-> New termo.dividir (P.termo , P.fator  )  }
      ;
 
     fator
@@ -322,41 +322,41 @@ Productions
          {-> New fator.variavel (P.variavel  )  }   |
 
      {expressao} T.parenteses_esquerdo P.expressao T.parenteses_direito
-         {-> New fator.expressao (T.parenteses_esquerdo , P.expressao , T.parenteses_direito  )  }
+         {-> New fator.expressao (P.expressao  )  }
      ;
 
     exp_logica
          {-> P.exp_logica  } =
 
      {igualdade} T.igualdade P.exp_logica
-         {-> New exp_logica.igualdade (T.igualdade , P.exp_logica  )  }   |
+         {-> New exp_logica.igualdade (P.exp_logica  )  }   |
 
      {diferente} T.diferente P.exp_logica
-         {-> New exp_logica.diferente (T.diferente , P.exp_logica  )  }   |
+         {-> New exp_logica.diferente (P.exp_logica  )  }   |
 
      {menor_ig} T.menor_igual P.exp_logica
-         {-> New exp_logica.menor_ig (T.menor_igual , P.exp_logica  )  }   |
+         {-> New exp_logica.menor_ig (P.exp_logica  )  }   |
 
      {maior_ig} T.maior_igual P.exp_logica
-         {-> New exp_logica.maior_ig (T.maior_igual , P.exp_logica  )  }   |
+         {-> New exp_logica.maior_ig (P.exp_logica  )  }   |
 
      {menor} T.menor P.exp_logica
-         {-> New exp_logica.menor (T.menor , P.exp_logica  )  }   |
+         {-> New exp_logica.menor (P.exp_logica  )  }   |
 
      {maior} T.maior P.exp_logica
-         {-> New exp_logica.maior (T.maior , P.exp_logica  )  }   |
+         {-> New exp_logica.maior (P.exp_logica  )  }   |
 
      {e} T.e P.exp_logica
-         {-> New exp_logica.e (T.e , P.exp_logica  )  }   |
+         {-> New exp_logica.e (P.exp_logica  )  }   |
 
      {ou} T.ou P.exp_logica
-         {-> New exp_logica.ou (T.ou , P.exp_logica  )  }   |
+         {-> New exp_logica.ou (P.exp_logica  )  }   |
 
      {xor} T.xor P.exp_logica
-         {-> New exp_logica.xor (T.xor , P.exp_logica  )  }   |
+         {-> New exp_logica.xor (P.exp_logica  )  }   |
 
      {not} T.nao P.fator
-         {-> New exp_logica.not (T.nao , P.fator  )  }   |
+         {-> New exp_logica.not (P.fator  )  }   |
 
      {operador_logico} P.fator
          {-> New exp_logica.operador_logico (P.fator  )  }
@@ -415,10 +415,10 @@ Abstract Syntax Tree
      {escrita} P.expressao |
      {se} P.expressao P.se_corpo |
      {avalie} P.expressao P.caso_comandos P.comandos |
-     {enquanto} T.enquanto T.parenteses_esquerdo P.expressao T.parenteses_direito T.faca P.comandos T.fimenquanto T.ponto_virgula |
-     {repita} T.repita P.comandos T.ate T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula |
-     {para} T.para P.variavel T.de [left]: T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula |
-     {para_seg} T.para P.variavel T.de [left]: T.num_inteiro T.passo T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula
+     {enquanto} P.expressao P.comandos |
+     {repita} P.comandos P.expressao |
+     {para} P.variavel [left]: T.num_inteiro [right]: T.num_inteiro P.comandos |
+     {para_seg} P.variavel [left]: T.num_inteiro T.num_inteiro [right]: T.num_inteiro P.comandos
      ;
 
     comandos =
@@ -428,45 +428,45 @@ Abstract Syntax Tree
 
     se_corpo =
      P.comando P.se_corpo |
-     {se_senao} P.comando T.senao P.comandos |
+     {se_senao} P.comando P.comandos |
      {se_unico} P.comando
      ;
 
     caso_comandos =
-     {caso} T.caso P.valor T.dois_pontos P.comando |
-     {casos} T.caso P.valor T.dois_pontos P.comando P.caso_comandos
+     {caso} P.valor P.comando |
+     {casos} P.valor P.comando P.caso_comandos
      ;
 
     expressao =
      {termo} P.termo |
-     {somar} P.expressao T.somar P.termo |
-     {subtrair} P.expressao T.subtrair P.termo |
+     {somar} P.expressao P.termo |
+     {subtrair} P.expressao P.termo |
      {exp_logica} P.expressao P.exp_logica
      ;
 
     termo =
      {fator} P.fator |
-     {multiplicar} P.termo T.multiplicar P.fator |
-     {dividir} P.termo T.dividir P.fator
+     {multiplicar} P.termo P.fator |
+     {dividir} P.termo P.fator
      ;
 
     fator =
      {valor} P.valor |
      {variavel} P.variavel |
-     {expressao} T.parenteses_esquerdo P.expressao T.parenteses_direito
+     {expressao} P.expressao
      ;
 
     exp_logica =
-     {igualdade} T.igualdade P.exp_logica |
-     {diferente} T.diferente P.exp_logica |
-     {menor_ig} T.menor_igual P.exp_logica |
-     {maior_ig} T.maior_igual P.exp_logica |
-     {menor} T.menor P.exp_logica |
-     {maior} T.maior P.exp_logica |
-     {e} T.e P.exp_logica |
-     {ou} T.ou P.exp_logica |
-     {xor} T.xor P.exp_logica |
-     {not} T.nao P.fator |
+     {igualdade} P.exp_logica |
+     {diferente} P.exp_logica |
+     {menor_ig} P.exp_logica |
+     {maior_ig} P.exp_logica |
+     {menor} P.exp_logica |
+     {maior} P.exp_logica |
+     {e} P.exp_logica |
+     {ou} P.exp_logica |
+     {xor} P.exp_logica |
+     {not} P.fator |
      {operador_logico} P.fator
      ;
 
