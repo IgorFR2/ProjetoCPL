@@ -147,20 +147,20 @@ Productions
          {-> P.programa  } =
 
      {acorpoprograma1} T.programa T.id T.inicio P.declaracoes T.fim
-         {-> New programa.corpo (T.id , P.declaracoes , [  ])  }   |
+         {-> New programa.corpo (T.id , [P.declaracoes.declaracao] , [  ])  }   |
 
      {acorpoprograma2} T.programa T.id T.inicio P.declaracoes P.cmd T.fim
-         {-> New programa.corpo (T.id , P.declaracoes , [ P.cmd.comando  ])  }
+         {-> New programa.corpo (T.id , [P.declaracoes.declaracao] , [ P.cmd.comando  ])  }
      ;
 
     declaracoes
-         {-> P.declaracoes  } =
+         {-> P.declaracao*  } =
 
      {declaracao} P.declaracao P.declaracoes
-         {-> New declaracoes.declaracao (P.declaracao , P.declaracoes  )  }   |
+         {-> [P.declaracao , P.declaracoes.declaracao]  }   |
 
      {fim_declaracao}
-         {-> New declaracoes.fim_declaracao ( )  }
+         {-> []  }
      ;
 
     declaracao
@@ -374,12 +374,7 @@ Productions
 
 Abstract Syntax Tree
     programa =
-     {corpo} T.id P.declaracoes P.comando*
-     ;
-
-    declaracoes =
-     {declaracao} P.declaracao P.declaracoes |
-     {fim_declaracao}
+     {corpo} T.id P.declaracao* P.comando*
      ;
 
     declaracao =
