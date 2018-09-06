@@ -235,29 +235,29 @@ Productions
          {-> New comando.se (P.expressao , P.se_corpo  )  }   |
 
      {avalie} T.avalie T.parenteses_esquerdo P.expressao T.parenteses_direito P.caso_comandos T.senao P.comandos T.fimavalie T.ponto_virgula
-         {-> New comando.avalie (P.expressao , P.caso_comandos , P.comandos  )  }   |
+         {-> New comando.avalie (P.expressao , P.caso_comandos , [P.comandos.comando]  )  }   |
 
      {enquanto} T.enquanto T.parenteses_esquerdo P.expressao T.parenteses_direito T.faca P.comandos T.fimenquanto T.ponto_virgula
-         {-> New comando.enquanto (P.expressao , P.comandos  )  }   |
+         {-> New comando.enquanto (P.expressao , [P.comandos.comando]  )  }   |
 
      {repita} T.repita P.comandos T.ate T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula
-         {-> New comando.repita (P.comandos , P.expressao  )  }   |
+         {-> New comando.repita ([P.comandos.comando] , P.expressao  )  }   |
 
      {para} T.para P.variavel T.de [left]: T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula
-         {-> New comando.para (P.variavel , left , right , P.comandos  )  }   |
+         {-> New comando.para (P.variavel , left , right , [P.comandos.comando]  )  }   |
 
      {para_seg} T.para P.variavel T.de [left]: T.num_inteiro T.passo T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula
-         {-> New comando.para_seg (P.variavel , left , T.num_inteiro , right , P.comandos  )  }
+         {-> New comando.para_seg (P.variavel , left , T.num_inteiro , right , [P.comandos.comando]  )  }
      ;
 
     comandos
-         {-> P.comandos  } =
+         {-> P.comando*  } =
 
      {comando_unitario} P.comando
-         {-> New comandos.comando_unitario (P.comando  )  }   |
+         {-> [P.comando.comando  ]  }   |
 
      {comandos} P.comando P.comandos
-         {-> New comandos.comandos (P.comando , P.comandos  )  }
+         {-> [P.comando.comando , P.comandos.comando  ]  }
      ;
 
     se_corpo
@@ -267,7 +267,7 @@ Productions
          {-> New se_corpo (P.comando , P.se_corpo  )  }   |
 
      {se_senao} P.comando T.senao P.comandos
-         {-> New se_corpo.se_senao (P.comando , P.comandos  )  }   |
+         {-> New se_corpo.se_senao (P.comando , [P.comandos.comando]  )  }   |
 
      {se_unico} P.comando
          {-> New se_corpo.se_unico (P.comando  )  }
@@ -411,21 +411,16 @@ Abstract Syntax Tree
      {leitura} P.variavel |
      {escrita} P.expressao |
      {se} P.expressao P.se_corpo |
-     {avalie} P.expressao P.caso_comandos P.comandos |
-     {enquanto} P.expressao P.comandos |
-     {repita} P.comandos P.expressao |
-     {para} P.variavel [left]: T.num_inteiro [right]: T.num_inteiro P.comandos |
-     {para_seg} P.variavel [left]: T.num_inteiro T.num_inteiro [right]: T.num_inteiro P.comandos
-     ;
-
-    comandos =
-     {comando_unitario} P.comando |
-     {comandos} P.comando P.comandos
+     {avalie} P.expressao P.caso_comandos P.comando* |
+     {enquanto} P.expressao P.comando+ |
+     {repita} P.comando+ P.expressao |
+     {para} P.variavel [left]: T.num_inteiro [right]: T.num_inteiro P.comando+ |
+     {para_seg} P.variavel [left]: T.num_inteiro T.num_inteiro [right]: T.num_inteiro P.comando+
      ;
 
     se_corpo =
      P.comando P.se_corpo |
-     {se_senao} P.comando P.comandos |
+     {se_senao} P.comando [right]:P.comando* |
      {se_unico} P.comando
      ;
 
