@@ -1,141 +1,467 @@
-//	www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
-/* Falta alguma coisa do LEXICO? (itens da parte 1 do documento que não foram aplicados/totalmente)
-Regras para identificadores:
-4 - Não podemos usar palavras reservadas (ex: inteiro: inteiro;)
-Regras para comentários:
-3 - Os comentários de bloco devem ser aninhados e balanceados.
-Regras para vetores:
-2 - Os índices dos vetores vão de 0 a tam-1 (isso também vale para strings).
-Regras para expressões lógicas:
-1 - Os operadores >, <, >= e <= não podem ser usados com operandos que sejam
-expressões lógicas.
-2 – Os operadores = e <> não podem ser usados em cadeia. Ex.: a = b = c
-3 – Uma cadeia com os operadores = e <> pode ser obtida através do uso de
-parênteses. Ex.: (a = b) = (c = d)
-Operadores:
-3 - Operadores booleanos: 'nao', 'e' e 'ou'.
-4 - A prioridade dos operadores é igual à de C, e pode ser alterada com o uso de
-parênteses.
-6 - Comandos são terminados com ; (ponto e vírgula).
+/*
+www.cin.ufpe.br/~if688/SableCC/SableCC_2008.1.ppt
 
+Configuracoes do sable no linux:
+- Location: /usr/lib/jvm/java-8-openjdk/jre/bin/java
+- Working Directory: ${container_loc}
+- Arguments: -classpath /home/igorfr2/Desktop/sablecc-3.2/lib/sablecc.jar org.sablecc.sablecc.SableCC ${resource_name}
+
+Coisas pendentes:
+- Verificar expressao -> expressao logica
 */
 
-//	Especificacoes gerais: 
-//	1) Id: _*,a*,A* // Proibido ' ',caract. especiais, palavras reservadas
-//	2) String em 'aspas simples'
-//	3) Comentarios em bloco aninhados e balanceados
+Package compilador ;
 
-  
-Package compilador ; 
-     
+
 Helpers 
-    //	 	Digitos alfanumericos e composicoes 	 
-    letramin	= ['a'..'z'] ;
-    letracaps 	= ['A'..'Z'];
-    letra 		= [letramin + letracaps];
-    digito 		= ['0' .. '9'] ; 
-    sp 			= ' '; 
-   	ctab 		= 9;
-    cr 			= 13;
-    nl 			= 10;
-    nline		= cr | nl | cr nl;
-    char 		= [letra + digito];
-    cmt_lin 	= '//';
-    cmt_a 		= '/*';
-    cmt_f 		= '*/';
-    todos 		= [0 .. 0xFFFF]; 
-    char_esp	= [[[0x20..0xFFFF]-letra]-digito];
-    
-    tipo_string	= 'caractere';
-    tipos_dados	= tipo_string|'real'|'inteiro'|'booleano'; 
-    word		= tipos_dados|'inicio'|'fim'|'se'|'senao'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
-    bool_true	= 'verdadeiro';
-    bool_false	= 'falso';
-    tprograma 	= 'programa';
-    tinicio		= 'inicio';
-    nome		= ('_'|letra)(char|'_')*;
+    // Digitos alfanumericos e composicoes
+    letramin    = ['a'..'z'] ;
+    letracaps   = ['A'..'Z'];
+    letra       = [letramin + letracaps];
+    digito      = ['0' .. '9'] ;
+    sp          = ' ';
+    ctab        = 9;
+    cr          = 13;
+    nl          = 10;
+    nline       = cr | nl | cr nl;
+    char        = [letra + digito];
+    cmt_linha     = '//';
+    cmt_a       = '/*';
+    cmt_f       = '*/';
+    todos       = [0 .. 0xFFFF];
+    char_esp    = [[[0x20..0xFFFF]-letra]-digito];
+
+    tipo_string = 'caractere';
+    tipos_dados = tipo_string|'real'|'inteiro'|'booleano';
+    word        = tipos_dados|'inicio'|'fim'|'se'|'senao'|'enquanto'|'para'|'avalie'|'caso'|'verdadeiro'|'falso';
+    bool_true   = 'verdadeiro';
+    bool_false  = 'falso';
+    h_programa  = 'programa';
+    h_inicio    = 'inicio';
+    nome        = ('_'|letra)(char|'_')*;
+
+
 States
     normal,
     comentario;
+
+
+Tokens
+    // Divisores
+    parenteses_esquerdo = '(';
+    parenteses_direito  = ')';
+    colchete_esquerdo   = '[';
+    colchete_direito    = ']';
+    //chave_direita     = '{';
+    //chave_esquerdo    = '}';
+    ponto_virgula       = ';';
+    dois_pontos         = ':';
+    virgula             = ',';
+    underline           = '_';
+    atribuir            = ':=';
+    tab                 = ctab;
+    enter               = cr | nl | cr nl;
+    espaco              = ' ';
+    igual               = '=';
+    programa            = h_programa;
+    inicio              = h_inicio;
+    fim                 = 'fim.';
     
-Tokens 
+    // Operadores Aritmeticos
+    subtrair    = '-';
+    somar       = '+';
+    dividir     = '/';
+    multiplicar = '*';
+    potencia    = '**';
+    mod         = '%';
+
+    // Operadores Logicos
+    maior       = '>';
+    menor       = '<';
+    maior_igual = '>=';
+    menor_igual = '<=';
+    nao         = '!';
+    e           = 'e';
+    ou          = '|';
+    xor         = '^';
+    igualdade   = '=';
+    diferente   = '<>';
     
-	// 		 Divisores 	    
-	parenteses_esquerdo	= '(';
-	parenteses_direito	= ')';
-	colchete_esquerdo	= '[';
-	colchete_direito	= ']';
-	//chave_direita		= '{';
-	//chave_esquerdo		= '}';
-	ponto_virgula		= ';';
-	dois_pontos			= ':';
-    virgula				= ',';
-    underline			= '_';
-    atribuir			= '<-';
-	tab					= ctab;
-	enter				= cr | nl | cr nl;
-	espaco 				= ' ';
-	igual				= '=';
-	programa			= tprograma;
-	inicio 				= tinicio;
-	fim 				= 'fim.';
-	
-	// 		Operadores	
-    // Aritmeticos 
-    soma 	= '+';
-	subtrair= '-';
-	mod 	= '%';
-	pow 	= '**';
-	
-	// Logicos 
-	maior		= '>';
-	menor 		= '<';
-	maior_igual = '>=';
-	menor_igual = '<=';
-	nao			= '!';
-	e			= 'e';
-	ou			= '|';
-	//igualdade	= '==';
-	diferente	= '<>';
-    
-	
-    //					 Palavras reservadas 				
-    //reservada 	= word;
-	real 		= 'real';
-	inteiro		= 'inteiro';
-    num_real 	= digito digito* ',' digito digito*;
-    num_inteiro = digito*; 
-	se	 		= 'se'; 
-	senao		= 'senao';
-	enquanto 	= 'enquanto';
-	para 		= 'para';
-	avalie	 	= 'avalie';	//<= o switch
-	caso 		= 'caso';	// <= o case
-	verdadeiro 	= bool_true;
-	falso 		= bool_false;
-	escreva		= 'escreva';
-	leia		= 'leia';
-	id 			= ('_'|letra)(char|'_')*;	
-	string		= 'caractere';
-	caracter 	= '''todos''';
-	
-	
-    //vetor 			= tipo col id col_e tamanho col_d semi <= type:id[tam];
-    vetor 				= tipos_dados':'sp? nome'['digito*'];';
-    vetor_error			= tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
-    vetor_string 		= tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
-    vetor_string_error	= tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
-    
-	comentario_linear = cmt_lin;
-    
-    {normal->comentario, comentario}
-    comentario = '/*';
-	{comentario} comentario_fim = '*/';
-	{comentario} comentario_corpo = [todos -['*' + '/']]*;
-	{comentario} estrela = '*';
-	{comentario} barra = '/';
-	{normal} comentario_fim_erro = '*/';
-    
-Productions 
-	// Producoes matematicas  
-	program = [left]:inteiro soma [right]:inteiro ponto_virgula;
+    //  Conectores
+    de      = 'de';
+    ate     = 'ate';
+    passo   = 'passo';
+    faca    = 'faca'; 
+
+    // Palavras reservadas
+    //reservada  = word;
+    real         = 'real';
+    inteiro      = 'inteiro';
+    t_caractere  = 'caractere';
+    num_real     = digito digito* ',' digito digito*;
+    num_inteiro  = digito*;
+    se           = 'se';
+    entao        = 'entao';
+    senao        = 'senao';
+    fimse        = 'fim se';
+    fimsenao     = 'fim senao';
+    enquanto     = 'enquanto';
+    fimenquanto  = 'fim enquanto';
+    para         = 'para';
+    fimpara      = 'fim para';
+    repita       = 'repita';
+    avalie       = 'avalie';    //<= o switch
+    fimavalie    = 'fim avalie';
+    caso         = 'caso';    // <= o case
+    verdadeiro   = bool_true;
+    falso        = bool_false;
+    escreva      = 'escreva';
+    leia         = 'leia';
+    const        = 'const';
+    tipos_dados  = tipos_dados;
+    caracter     = '''todos''';
+    //vetor             = tipo col id col_e tamanho col_d semi <= type:id[tam];
+    vetor               = tipos_dados':'sp? nome'['digito*'];';
+    vetor_error         = tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
+    vetor_string        = tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
+    vetor_string_error  = tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
+    id                  = ('_'|letra)(char|'_')*;
+
+    // Comentarios
+    comentario_linear = cmt_linha;
+    {normal->comentario, comentario} comentario = '/*';
+    {comentario} comentario_fim = '*/';
+    {comentario} comentario_corpo = [todos -['*' + '/']]*;
+    {comentario} estrela = '*';
+    {comentario} barra = '/';
+    {normal} comentario_fim_erro = '*/';
+
+
+Ignored Tokens
+    enter, espaco, tab, comentario_fim_erro, comentario;
+
+
+Productions
+
+    programa
+         {-> P.programa  } =
+
+     {acorpoprograma1} T.programa T.id T.inicio P.declaracoes T.fim
+         {-> New programa.corpo (T.id , [P.declaracoes.declaracao] , [  ])  }   |
+
+     {acorpoprograma2} T.programa T.id T.inicio P.declaracoes P.cmd T.fim
+         {-> New programa.corpo (T.id , [P.declaracoes.declaracao] , [ P.cmd.comando  ])  }
+     ;
+
+    declaracoes
+         {-> P.declaracao*  } =
+
+     {declaracao} P.declaracao P.declaracoes
+         {-> [P.declaracao , P.declaracoes.declaracao]  }   |
+
+     {fim_declaracao}
+         {-> []  }
+     ;
+
+    declaracao
+         {-> P.declaracao  } =
+
+     P.tipos_dados T.dois_pontos P.variaveis T.ponto_virgula
+         {-> New declaracao (P.tipos_dados , P.variaveis)  }   |
+
+     {constante} T.const T.id P.valor T.ponto_virgula
+         {-> New declaracao.constante (T.id , P.valor)  }
+     ;
+
+    tipos_dados
+         {-> P.tipos_dados  } =
+
+     {inteiro} T.inteiro
+         {-> New tipos_dados.inteiro (T.inteiro  )  }   |
+
+     {real} T.real
+         {-> New tipos_dados.real (T.real  )  }   |
+
+     {caractere} T.t_caractere
+         {-> New tipos_dados.caractere (T.t_caractere  )  }
+     ;
+
+    variaveis
+         {-> P.variaveis  } =
+
+     {variavel} P.variavel
+         {-> New variaveis.variavel (P.variavel  )  }   |
+
+     {variaveis} P.variavel T.virgula P.variaveis
+         {-> New variaveis.variaveis (P.variavel , P.variaveis  )  }
+     ;
+
+    variavel
+         {-> P.variavel  } =
+
+     {nome} T.id
+         {-> New variavel.nome (T.id  )  }   |
+
+     {vetor} T.id T.colchete_esquerdo T.num_inteiro T.colchete_direito
+         {-> New variavel.vetor (T.id , T.num_inteiro)  }
+     ;
+
+    valor
+         {-> P.valor  } =
+
+     {val_caractere} T.vetor_string
+         {-> New valor.val_caractere (T.vetor_string  )  }   |
+
+     {val_inteiro} T.num_inteiro
+         {-> New valor.val_inteiro (T.num_inteiro  )  }   |
+
+     {val_real} T.num_real
+         {-> New valor.val_real (T.num_real  )  }
+     ;
+
+    comando
+         {-> P.comando  } =
+
+     {atribuicao} P.variavel T.atribuir P.expressao T.ponto_virgula
+         {-> New comando.atribuicao (P.variavel , P.expressao  )  }   |
+
+     {leitura} T.leia T.parenteses_esquerdo P.variavel T.parenteses_direito T.ponto_virgula
+         {-> New comando.leitura (P.variavel  )  }   |
+
+     {escrita} T.escreva T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula
+         {-> New comando.escrita (P.expressao  )  }   |
+
+     {se} T.se T.parenteses_esquerdo P.expressao T.parenteses_direito T.entao P.se_corpo T.fimse T.ponto_virgula
+         {-> New comando.se (P.expressao , P.se_corpo  )  }   |
+
+     {avalie} T.avalie T.parenteses_esquerdo P.expressao T.parenteses_direito P.caso_comandos T.senao P.comandos T.fimavalie T.ponto_virgula
+         {-> New comando.avalie (P.expressao , P.caso_comandos , P.comandos  )  }   |
+
+     {enquanto} T.enquanto T.parenteses_esquerdo P.expressao T.parenteses_direito T.faca P.comandos T.fimenquanto T.ponto_virgula
+         {-> New comando.enquanto (P.expressao , P.comandos  )  }   |
+
+     {repita} T.repita P.comandos T.ate T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula
+         {-> New comando.repita (P.comandos , P.expressao  )  }   |
+
+     {para} T.para P.variavel T.de [left]: T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula
+         {-> New comando.para (P.variavel , left , right , P.comandos  )  }   |
+
+     {para_seg} T.para P.variavel T.de [left]: T.num_inteiro T.passo T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula
+         {-> New comando.para_seg (P.variavel , left , T.num_inteiro , right , P.comandos  )  }
+     ;
+
+    comandos
+         {-> P.comandos  } =
+
+     {comando_unitario} P.comando
+         {-> New comandos.comando_unitario (P.comando  )  }   |
+
+     {comandos} P.comando P.comandos
+         {-> New comandos.comandos (P.comando , P.comandos  )  }
+     ;
+
+    se_corpo
+         {-> P.se_corpo  } =
+
+     P.comando P.se_corpo
+         {-> New se_corpo (P.comando , P.se_corpo  )  }   |
+
+     {se_senao} P.comando T.senao P.comandos
+         {-> New se_corpo.se_senao (P.comando , P.comandos  )  }   |
+
+     {se_unico} P.comando
+         {-> New se_corpo.se_unico (P.comando  )  }
+     ;
+
+    caso_comandos
+         {-> P.caso_comandos  } =
+
+     {caso} T.caso P.valor T.dois_pontos P.comando
+         {-> New caso_comandos.caso (P.valor , P.comando  )  }   |
+
+     {casos} T.caso P.valor T.dois_pontos P.comando P.caso_comandos
+         {-> New caso_comandos.casos (P.valor , P.comando , P.caso_comandos  )  }
+     ;
+
+    expressao
+         {-> P.expressao  } =
+
+     {termo} P.termo
+         {-> New expressao.termo (P.termo  )  }   |
+
+     {somar} P.expressao T.somar P.termo
+         {-> New expressao.somar (P.expressao , P.termo  )  }   |
+
+     {subtrair} P.expressao T.subtrair P.termo
+         {-> New expressao.subtrair (P.expressao , P.termo  )  }   |
+
+     {exp_logica} P.expressao P.exp_logica
+         {-> New expressao.exp_logica (P.expressao , P.exp_logica  )  }
+     ;
+
+    termo
+         {-> P.termo  } =
+
+     {fator} P.fator
+         {-> New termo.fator (P.fator  )  }   |
+
+     {multiplicar} P.termo T.multiplicar P.fator
+         {-> New termo.multiplicar (P.termo , P.fator  )  }   |
+
+     {dividir} P.termo T.dividir P.fator
+         {-> New termo.dividir (P.termo , P.fator  )  }
+     ;
+
+    fator
+         {-> P.fator  } =
+
+     {valor} P.valor
+         {-> New fator.valor (P.valor  )  }   |
+
+     {variavel} P.variavel
+         {-> New fator.variavel (P.variavel  )  }   |
+
+     {expressao} T.parenteses_esquerdo P.expressao T.parenteses_direito
+         {-> New fator.expressao (P.expressao  )  }
+     ;
+
+    exp_logica
+         {-> P.exp_logica  } =
+
+     {igualdade} T.igualdade P.exp_logica
+         {-> New exp_logica.igualdade (P.exp_logica  )  }   |
+
+     {diferente} T.diferente P.exp_logica
+         {-> New exp_logica.diferente (P.exp_logica  )  }   |
+
+     {menor_ig} T.menor_igual P.exp_logica
+         {-> New exp_logica.menor_ig (P.exp_logica  )  }   |
+
+     {maior_ig} T.maior_igual P.exp_logica
+         {-> New exp_logica.maior_ig (P.exp_logica  )  }   |
+
+     {menor} T.menor P.exp_logica
+         {-> New exp_logica.menor (P.exp_logica  )  }   |
+
+     {maior} T.maior P.exp_logica
+         {-> New exp_logica.maior (P.exp_logica  )  }   |
+
+     {e} T.e P.exp_logica
+         {-> New exp_logica.e (P.exp_logica  )  }   |
+
+     {ou} T.ou P.exp_logica
+         {-> New exp_logica.ou (P.exp_logica  )  }   |
+
+     {xor} T.xor P.exp_logica
+         {-> New exp_logica.xor (P.exp_logica  )  }   |
+
+     {not} T.nao P.fator
+         {-> New exp_logica.not (P.fator  )  }   |
+
+     {operador_logico} P.fator
+         {-> New exp_logica.operador_logico (P.fator  )  }
+     ;
+
+    cmd
+         {-> P.comando*  } =
+
+     {terminal} P.comando
+         {-> [ P.comando.comando  ]  }   |
+
+     {non_terminal} P.cmd P.comando
+         {-> [ cmd.comando, P.comando.comando  ]  }
+     ;
+
+Abstract Syntax Tree
+    programa =
+     {corpo} T.id P.declaracao* P.comando*
+     ;
+
+    declaracao =
+     P.tipos_dados P.variaveis |
+     {constante} T.id P.valor
+     ;
+
+    tipos_dados =
+     {inteiro} T.inteiro |
+     {real} T.real |
+     {caractere} T.t_caractere
+     ;
+
+    variaveis =
+     {variavel} P.variavel |
+     {variaveis} P.variavel P.variaveis
+     ;
+
+    variavel =
+     {nome} T.id |
+     {vetor} T.id T.num_inteiro
+     ;
+
+    valor =
+     {val_caractere} T.vetor_string |
+     {val_inteiro} T.num_inteiro |
+     {val_real} T.num_real
+     ;
+
+    comando =
+     {atribuicao} P.variavel P.expressao |
+     {leitura} P.variavel |
+     {escrita} P.expressao |
+     {se} P.expressao P.se_corpo |
+     {avalie} P.expressao P.caso_comandos P.comandos |
+     {enquanto} P.expressao P.comandos |
+     {repita} P.comandos P.expressao |
+     {para} P.variavel [left]: T.num_inteiro [right]: T.num_inteiro P.comandos |
+     {para_seg} P.variavel [left]: T.num_inteiro T.num_inteiro [right]: T.num_inteiro P.comandos
+     ;
+
+    comandos =
+     {comando_unitario} P.comando |
+     {comandos} P.comando P.comandos
+     ;
+
+    se_corpo =
+     P.comando P.se_corpo |
+     {se_senao} P.comando P.comandos |
+     {se_unico} P.comando
+     ;
+
+    caso_comandos =
+     {caso} P.valor P.comando |
+     {casos} P.valor P.comando P.caso_comandos
+     ;
+
+    expressao =
+     {termo} P.termo |
+     {somar} P.expressao P.termo |
+     {subtrair} P.expressao P.termo |
+     {exp_logica} P.expressao P.exp_logica
+     ;
+
+    termo =
+     {fator} P.fator |
+     {multiplicar} P.termo P.fator |
+     {dividir} P.termo P.fator
+     ;
+
+    fator =
+     {valor} P.valor |
+     {variavel} P.variavel |
+     {expressao} P.expressao
+     ;
+
+    exp_logica =
+     {igualdade} P.exp_logica |
+     {diferente} P.exp_logica |
+     {menor_ig} P.exp_logica |
+     {maior_ig} P.exp_logica |
+     {menor} P.exp_logica |
+     {maior} P.exp_logica |
+     {e} P.exp_logica |
+     {ou} P.exp_logica |
+     {xor} P.exp_logica |
+     {not} P.fator |
+     {operador_logico} P.fator
+     ;
+

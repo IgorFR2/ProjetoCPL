@@ -1,17 +1,49 @@
-{{programa primeiro
+programa primeiro
 inicio
 	inteiro : a , b , c ;
-	real : r  ,  s  ,  p 
-;
-	caractere: f
-, g
-, h
-;
-	se(a=b e nao(c=a) ou r <> s){
-		leia(f)     ;
-	}
-	a <- 1;
-	b <- 2;
-	c < a + b;
+	real : r  ,  s  ,  p;
+	caractere: f, g, h;
+	const a 10;
+	
+	/* a := 3 - -1; */
+	a := 1;
+	b := a;
+	leia(c);
 	escreva(c);
+	
+	se  (  exp  ) entao a:=b;  				fim se; 
+	se  (  exp  ) entao a:=b;  senao b:=3;  fim se;
+	 
+	avalie  ( exp )  caso 1: a:=3; caso 2: b:=3; senao b:=2; fim avalie;
+	enquanto ( a>b )  faca a:=3; fim enquanto;
+	repita a:=2; ate ( a<b );
+	
+	para x de 1 ate 10 faca a:=2; fim para;
+	para x de 1 passo 2 ate 3 faca a:=2; fim para;
+	
 fim.
+
+/*
+	Arrumar "comentario linear", provavelmente falta a mudanca de estado (normal->comentario)
+	Arrumar Exp e Exp booleanos
+		declaracao
+	OK) tipo: a,b,c;
+	OK) const a X;
+	
+		comandos
+	OK) atribuir;
+	OK) leia ( .. );
+	OK) escreva ( .. );
+	
+	(Adicionar Se sem Senao!)
+	OK) se ( .. ) entao fim se; 
+	OK) avalie ( .. ) caso valor: .. caso valor: .. senao: .. fim avalie;
+	OK) enquanto ( .. ) faca .. fim enquanto;
+	OK) repita ..  ate ( .. );
+	OK) para var de int ate int faca .. fim para;
+	OK) para var de int passo int ate int faca .. fim para;
+	
+		Exp e Exp booleanos
+	X) Exp -> (Logica)
+	X) Logica -> (Exp)
+*/

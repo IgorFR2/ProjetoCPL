@@ -1,0 +1,19 @@
+programa teste01
+inicio
+
+   se ( (s = d) e (3+3 > 2) ) entao
+      escreva('OK!');
+   fim se;
+
+
+   inteiro:a;
+   caractere: b;
+   const eh 2,71;
+   const pi 3,14;
+
+   b := z + 1;
+
+
+
+
+fim.

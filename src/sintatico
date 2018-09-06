@@ -1,0 +1,33 @@
+programa = T.id  P.declaracao*  P.comando*;
+
+declaracao = P.tipos_dados  P.variavel*
+           | {constante} T.id  P.valor;
+tipos_dados = {inteiro} T.inteiro | {real} T.real | {caractere} T.t_caractere;
+variavel = {nome} T.id | {vetor} T.id  T.num_inteiro ;
+valor = {val_caractere} T.vetor_string | {val_inteiro} T.num_inteiro | {val_real} T.num_real;
+
+comando = {atribuicao} P.variavel  P.exp
+        | {leitura}  P.variavel
+        | {escrita}  P.exp
+        | {se}       P.exp  P.comando+  P.comando*
+        | {avalie}   P.exp  P.comando+  P.comando*
+        | {enquanto} P.exp  P.comando+
+        | {repita}   P.comando*  P.exp
+        | {para}     P.variavel  [de]:T.num_inteiro  [ate]:T.num_inteiro  P.comando+
+        | {para_seg} P.variavel  [de]:T.num_inteiro  [passo]:T.num_inteiro  [ate]:T.num_inteiro  P.comando+;
+caso_comando = {caso} P.valor  P.comando*;
+
+exp = {somar}       P.exp  P.exp
+    | {subtrair}    P.exp  P.exp
+    | {multiplicar} P.exp  P.exp
+    | {dividir}     P.exp  P.exp
+    | {maior}       P.exp  P.exp
+    | {menor}       P.exp  P.exp
+    | {maior_ig}    P.exp  P.exp
+    | {menor_ig}    P.exp  P.exp
+    | {nao}         P.exp  P.exp
+    | {e}           P.exp  P.exp
+    | {ou}          P.exp  P.exp
+    | {igualdade}   P.exp  P.exp
+    | {diferente}   P.exp  P.exp
+    | {variavel} P.variavel;
