@@ -167,7 +167,7 @@ Productions
          {-> P.declaracao  } =
 
      P.tipos_dados T.dois_pontos P.variaveis T.ponto_virgula
-         {-> New declaracao (P.tipos_dados , P.variaveis)  }   |
+         {-> New declaracao (P.tipos_dados , [P.variaveis.variavel])  }   |
 
      {constante} T.const T.id P.valor T.ponto_virgula
          {-> New declaracao.constante (T.id , P.valor)  }
@@ -187,13 +187,13 @@ Productions
      ;
 
     variaveis
-         {-> P.variaveis  } =
+         {-> P.variavel+  } =
 
      {variavel} P.variavel
-         {-> New variaveis.variavel (P.variavel  )  }   |
+         {-> [P.variavel.variavel]  }   |
 
      {variaveis} P.variavel T.virgula P.variaveis
-         {-> New variaveis.variaveis (P.variavel , P.variaveis  )  }
+         {-> [P.variavel.variavel , P.variaveis.variavel]  }
      ;
 
     variavel
@@ -385,7 +385,7 @@ Abstract Syntax Tree
      ;
 
     declaracao =
-     P.tipos_dados P.variaveis |
+     P.tipos_dados P.variavel+ |
      {constante} T.id P.valor
      ;
 
@@ -393,11 +393,6 @@ Abstract Syntax Tree
      {inteiro} T.inteiro |
      {real} T.real |
      {caractere} T.t_caractere
-     ;
-
-    variaveis =
-     {variavel} P.variavel |
-     {variaveis} P.variavel P.variaveis
      ;
 
     variavel =
