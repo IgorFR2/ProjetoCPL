@@ -185,26 +185,27 @@ Productions
 
     expressao = {termo} P.termo
               | {somar} P.expressao  T.somar  P.termo
-              | {subtrair} P.expressao  T.subtrair  P.termo
-              | {exp_logica} P.expressao  P.exp_logica;
+              | {subtrair} P.expressao  T.subtrair  P.termo;
 
-    termo = {fator} P.fator
-          | {multiplicar} P.termo  T.multiplicar  P.fator
-          | {dividir} P.termo  T.dividir  P.fator;
+    termo = {exp_logica} P.exp_logica
+          | {multiplicar} P.termo  T.multiplicar  P.exp_logica
+          | {dividir} P.termo  T.dividir  P.exp_logica;
+
+    exp_logica = | {fator} P.fator
+               | {igualdade} P.exp_logica  T.igualdade  P.fator
+               | {diferente} P.exp_logica  T.diferente  P.fator
+               | {menor_ig}  P.exp_logica  T.menor_igual  P.fator
+               | {maior_ig}  P.exp_logica  T.maior_igual  P.fator
+               | {menor}     P.exp_logica  T.menor  P.fator
+               | {maior}     P.exp_logica  T.maior  P.fator
+               | {e}         P.exp_logica  T.e  P.fator
+               | {ou}        P.exp_logica  T.ou  P.fator
+               | {xor}       P.exp_logica  T.xor  P.fator
+               | {not}       P.exp_logica  T.nao  P.fator;
 
     fator = {valor} P.valor
           | {variavel} P.variavel
-          //| {inversao} T.subtrair  P.expressao
+          // | {inversao} T.subtrair  P.expressao
           | {expressao} T.parenteses_esquerdo  P.expressao  T.parenteses_direito;
 
-    exp_logica = {igualdade} T.igualdade  P.exp_logica
-               | {diferente} T.diferente  P.exp_logica
-               | {menor_ig}  T.menor_igual  P.exp_logica
-               | {maior_ig}  T.maior_igual  P.exp_logica
-               | {menor}     T.menor  P.exp_logica
-               | {maior}     T.maior  P.exp_logica
-               | {e}         T.e  P.exp_logica
-               | {ou}        T.ou  P.exp_logica
-               | {xor}       T.xor  P.exp_logica
-               | {not}       T.nao  P.fator
-               | {operador_logico} P.fator;
+
