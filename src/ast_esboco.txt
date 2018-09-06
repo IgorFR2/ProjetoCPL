@@ -1,0 +1,41 @@
+Abstract Syntax Tree
+    programa = T.id  P.declaracao*  P.comando*;
+
+    declaracao = P.tipos_dados  P.variavel+
+               | {constante} T.id P.valor;
+    tipos_dados = {inteiro} T.inteiro
+                | {real} T.real
+                | {caractere} T.t_caractere;
+    variavel = {nome} T.id
+             | {vetor} T.id  T.num_inteiro ;
+    valor = {val_caractere} T.vetor_string
+          | {val_inteiro} T.num_inteiro
+          | {val_real} T.num_real;
+
+    comando = {atribuicao} P.variavel  P.expressao
+            | {leitura}  P.variavel
+            | {escrita}  P.expressao
+            | {se}       P.expressao  [left]:P.comando+  [right]:P.comando*
+            | {avalie}   P.expressao  P.caso_comando+  P.comando*
+            | {enquanto} P.expressao  P.comando+
+            | {repita}   P.comando+  P.expressao
+            | {para}     P.variavel  [left]:T.num_inteiro  [right]:T.num_inteiro  P.comando+
+            | {para_seg} P.variavel  [left]:T.num_inteiro  T.num_inteiro  [right]:T.num_inteiro  P.comando+;
+    caso_comando = P.valor  P.comando+;
+
+    expressao = {valor}       P.valor
+              | {variavel}    P.variavel;
+              | {somar}       [left]:P.expressao  [right]:P.expressao
+              | {subtrair}    [left]:P.expressao  [right]:P.expressao
+              | {multiplicar} [left]:P.expressao  [right]:P.expressao
+              | {dividir}     [left]:P.expressao  [right]:P.expressao
+              | {igualdade}   [left]:P.expressao  [right]:P.expressao
+              | {diferente}   [left]:P.expressao  [right]:P.expressao
+              | {maior}       [left]:P.expressao  [right]:P.expressao
+              | {menor}       [left]:P.expressao  [right]:P.expressao
+              | {maior_ig}    [left]:P.expressao  [right]:P.expressao
+              | {menor_ig}    [left]:P.expressao  [right]:P.expressao
+              | {not}         P.expressao
+              | {e}           [left]:P.expressao  [right]:P.expressao
+              | {ou}          [left]:P.expressao  [right]:P.expressao
+              | {xor}         [left]:P.expressao  [right]:P.expressao;
