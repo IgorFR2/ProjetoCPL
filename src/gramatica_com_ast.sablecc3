@@ -167,7 +167,7 @@ Productions
          {-> P.declaracao  } =
 
      P.tipos_dados T.dois_pontos P.variaveis T.ponto_virgula
-         {-> New declaracao (P.tipos_dados , P.variaveis)  }   |
+         {-> New declaracao (P.tipos_dados , [P.variaveis.variavel])  }   |
 
      {constante} T.const T.id P.valor T.ponto_virgula
          {-> New declaracao.constante (T.id , P.valor)  }
@@ -187,13 +187,13 @@ Productions
      ;
 
     variaveis
-         {-> P.variaveis  } =
+         {-> P.variavel*  } =
 
      {variavel} P.variavel
-         {-> New variaveis.variavel (P.variavel  )  }   |
+         {-> [P.variavel.variavel]  }   |
 
      {variaveis} P.variavel T.virgula P.variaveis
-         {-> New variaveis.variaveis (P.variavel , P.variaveis  )  }
+         {-> [P.variavel.variavel , P.variaveis.variavel]  }
      ;
 
     variavel
@@ -235,29 +235,29 @@ Productions
          {-> New comando.se (P.expressao , P.se_corpo  )  }   |
 
      {avalie} T.avalie T.parenteses_esquerdo P.expressao T.parenteses_direito P.caso_comandos T.senao P.comandos T.fimavalie T.ponto_virgula
-         {-> New comando.avalie (P.expressao , P.caso_comandos , P.comandos  )  }   |
+         {-> New comando.avalie (P.expressao , P.caso_comandos , [P.comandos.comando]  )  }   |
 
      {enquanto} T.enquanto T.parenteses_esquerdo P.expressao T.parenteses_direito T.faca P.comandos T.fimenquanto T.ponto_virgula
-         {-> New comando.enquanto (P.expressao , P.comandos  )  }   |
+         {-> New comando.enquanto (P.expressao , [P.comandos.comando]  )  }   |
 
      {repita} T.repita P.comandos T.ate T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula
-         {-> New comando.repita (P.comandos , P.expressao  )  }   |
+         {-> New comando.repita ([P.comandos.comando] , P.expressao  )  }   |
 
      {para} T.para P.variavel T.de [left]: T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula
-         {-> New comando.para (P.variavel , left , right , P.comandos  )  }   |
+         {-> New comando.para (P.variavel , left , right , [P.comandos.comando]  )  }   |
 
      {para_seg} T.para P.variavel T.de [left]: T.num_inteiro T.passo T.num_inteiro T.ate [right]: T.num_inteiro T.faca P.comandos T.fimpara T.ponto_virgula
-         {-> New comando.para_seg (P.variavel , left , T.num_inteiro , right , P.comandos  )  }
+         {-> New comando.para_seg (P.variavel , left , T.num_inteiro , right , [P.comandos.comando]  )  }
      ;
 
     comandos
-         {-> P.comandos  } =
+         {-> P.comando*  } =
 
      {comando_unitario} P.comando
-         {-> New comandos.comando_unitario (P.comando  )  }   |
+         {-> [P.comando.comando  ]  }   |
 
      {comandos} P.comando P.comandos
-         {-> New comandos.comandos (P.comando , P.comandos  )  }
+         {-> [P.comando.comando , P.comandos.comando  ]  }
      ;
 
     se_corpo
@@ -267,7 +267,7 @@ Productions
          {-> New se_corpo (P.comando , P.se_corpo  )  }   |
 
      {se_senao} P.comando T.senao P.comandos
-         {-> New se_corpo.se_senao (P.comando , P.comandos  )  }   |
+         {-> New se_corpo.se_senao (P.comando , [P.comandos.comando]  )  }   |
 
      {se_unico} P.comando
          {-> New se_corpo.se_unico (P.comando  )  }
@@ -276,97 +276,97 @@ Productions
     caso_comandos
          {-> P.caso_comandos  } =
 
-     {caso} T.caso P.valor T.dois_pontos P.comando
-         {-> New caso_comandos.caso (P.valor , P.comando  )  }   |
+     {caso} T.caso P.valor T.dois_pontos P.comandos
+         {-> New caso_comandos.caso (P.valor , [P.comandos.comando]  )  }   |
 
-     {casos} T.caso P.valor T.dois_pontos P.comando P.caso_comandos
-         {-> New caso_comandos.casos (P.valor , P.comando , P.caso_comandos  )  }
+     {casos} T.caso P.valor T.dois_pontos P.comandos P.caso_comandos
+         {-> New caso_comandos.casos (P.valor , [P.comandos.comando] , P.caso_comandos  )  }
      ;
 
     expressao
          {-> P.expressao  } =
 
      {igualdade} P.expressao T.igualdade P.prec2
-         {-> New expressao.igualdade (P.expressao , T.igualdade , P.prec2  )  }   |
+         {-> New expressao.igualdade (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {diferente} P.expressao T.diferente P.prec2
-         {-> New expressao.diferente (P.expressao , T.diferente , P.prec2  )  }   |
+         {-> New expressao.diferente (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {menor_ig} P.expressao T.menor_igual P.prec2
-         {-> New expressao.menor_ig (P.expressao , T.menor_igual , P.prec2  )  }   |
+         {-> New expressao.menor_ig (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {maior_ig} P.expressao T.maior_igual P.prec2
-         {-> New expressao.maior_ig (P.expressao , T.maior_igual , P.prec2  )  }   |
+         {-> New expressao.maior_ig (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {menor} P.expressao T.menor P.prec2
-         {-> New expressao.menor (P.expressao , T.menor , P.prec2  )  }   |
+         {-> New expressao.menor (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {maior} P.expressao T.maior P.prec2
-         {-> New expressao.maior (P.expressao , T.maior , P.prec2  )  }   |
+         {-> New expressao.maior (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {e} P.expressao T.e P.prec2
-         {-> New expressao.e (P.expressao , T.e , P.prec2  )  }   |
+         {-> New expressao.e (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {ou} P.expressao T.ou P.prec2
-         {-> New expressao.ou (P.expressao , T.ou , P.prec2  )  }   |
+         {-> New expressao.ou (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {xor} P.expressao T.xor P.prec2
-         {-> New expressao.xor (P.expressao , T.xor , P.prec2  )  }   |
+         {-> New expressao.xor (P.expressao.expressao , P.prec2.expressao  )  }   |
 
-     {not} P.expressao T.nao P.prec2
-         {-> New expressao.not (P.expressao , T.nao , P.prec2  )  }   |
+     {not} T.nao P.prec2
+         {-> New expressao.not (P.prec2.expressao  )  }   |
 
      {prec2} P.prec2
-         {-> New expressao.prec2 (P.prec2  )  }
+         {-> P.prec2.expressao  }
      ;
 
     prec2
-         {-> P.prec2  } =
+         {-> P.expressao  } =
 
      {inversao} T.subtrair P.prec3
-         {-> New prec2.inversao (T.subtrair , P.prec3  )  }   |
+         {-> New expressao.inversao (P.prec3.expressao  )  }   |
 
      {prec3} prec3
-         {-> New prec2.prec3 (prec3  )  }
+         {-> P.prec3.expressao  }
      ;
 
     prec3
-         {-> P.prec3  } =
+         {-> P.expressao  } =
 
      {somar} P.prec3 T.somar P.prec4
-         {-> New prec3.somar (P.prec3 , T.somar , P.prec4  )  }   |
+         {-> New expressao.somar (P.prec3.expressao , P.prec4.expressao  )  }   |
 
      {subtrair} P.prec3 T.subtrair P.prec4
-         {-> New prec3.subtrair (P.prec3 , T.subtrair , P.prec4  )  }   |
+         {-> New expressao.subtrair (P.prec3.expressao , P.prec4.expressao  )  }   |
 
      {prec4} P.prec4
-         {-> New prec3.prec4 (P.prec4  )  }
+         {-> P.prec4.expressao  }
      ;
 
     prec4
-         {-> P.prec4  } =
+         {-> P.expressao  } =
 
      {multiplicar} P.prec4 T.multiplicar P.prec5
-         {-> New prec4.multiplicar (P.prec4 , T.multiplicar , P.prec5  )  }   |
+         {-> New expressao.multiplicar (P.prec4.expressao , P.prec5.expressao  )  }   |
 
      {dividir} P.prec4 T.dividir P.prec5
-         {-> New prec4.dividir (P.prec4 , T.dividir , P.prec5  )  }   |
+         {-> New expressao.dividir (P.prec4.expressao , P.prec5.expressao  )  }   |
 
      {prec5} P.prec5
-         {-> New prec4.prec5 (P.prec5  )  }
+         {-> P.prec5.expressao  }
      ;
 
     prec5
-         {-> P.prec5  } =
+         {-> P.expressao  } =
 
      {valor} P.valor
-         {-> New prec5.valor (P.valor  )  }   |
+         {-> New expressao.valor (P.valor  )  }   |
 
      {variavel} P.variavel
-         {-> New prec5.variavel (P.variavel  )  }   |
+         {-> New expressao.variavel (P.variavel  )  }   |
 
      {expressao} T.parenteses_esquerdo P.expressao T.parenteses_direito
-         {-> New prec5.expressao (T.parenteses_esquerdo , P.expressao , T.parenteses_direito  )  }
+         {-> P.expressao.expressao  }
      ;
 
     cmd
@@ -385,7 +385,7 @@ Abstract Syntax Tree
      ;
 
     declaracao =
-     P.tipos_dados P.variaveis |
+     P.tipos_dados P.variavel+ |
      {constante} T.id P.valor
      ;
 
@@ -393,11 +393,6 @@ Abstract Syntax Tree
      {inteiro} T.inteiro |
      {real} T.real |
      {caractere} T.t_caractere
-     ;
-
-    variaveis =
-     {variavel} P.variavel |
-     {variaveis} P.variavel P.variaveis
      ;
 
     variavel =
@@ -416,63 +411,41 @@ Abstract Syntax Tree
      {leitura} P.variavel |
      {escrita} P.expressao |
      {se} P.expressao P.se_corpo |
-     {avalie} P.expressao P.caso_comandos P.comandos |
-     {enquanto} P.expressao P.comandos |
-     {repita} P.comandos P.expressao |
-     {para} P.variavel [left]: T.num_inteiro [right]: T.num_inteiro P.comandos |
-     {para_seg} P.variavel [left]: T.num_inteiro T.num_inteiro [right]: T.num_inteiro P.comandos
-     ;
-
-    comandos =
-     {comando_unitario} P.comando |
-     {comandos} P.comando P.comandos
+     {avalie} P.expressao P.caso_comandos P.comando* |
+     {enquanto} P.expressao P.comando+ |
+     {repita} P.comando+ P.expressao |
+     {para} P.variavel [left]: T.num_inteiro [right]: T.num_inteiro P.comando+ |
+     {para_seg} P.variavel [left]: T.num_inteiro T.num_inteiro [right]: T.num_inteiro P.comando+
      ;
 
     se_corpo =
      P.comando P.se_corpo |
-     {se_senao} P.comando P.comandos |
+     {se_senao} P.comando [senao]:P.comando* |
      {se_unico} P.comando
      ;
 
     caso_comandos =
-     {caso} P.valor P.comando |
-     {casos} P.valor P.comando P.caso_comandos
+     {caso} P.valor P.comando+ |
+     {casos} P.valor P.comando+ P.caso_comandos
      ;
 
     expressao =
-     {igualdade} P.expressao T.igualdade P.prec2 |
-     {diferente} P.expressao T.diferente P.prec2 |
-     {menor_ig} P.expressao T.menor_igual P.prec2 |
-     {maior_ig} P.expressao T.maior_igual P.prec2 |
-     {menor} P.expressao T.menor P.prec2 |
-     {maior} P.expressao T.maior P.prec2 |
-     {e} P.expressao T.e P.prec2 |
-     {ou} P.expressao T.ou P.prec2 |
-     {xor} P.expressao T.xor P.prec2 |
-     {not} P.expressao T.nao P.prec2 |
-     {prec2} P.prec2
-     ;
-
-    prec2 =
-     {inversao} T.subtrair P.prec3 |
-     {prec3} prec3
-     ;
-
-    prec3 =
-     {somar} P.prec3 T.somar P.prec4 |
-     {subtrair} P.prec3 T.subtrair P.prec4 |
-     {prec4} P.prec4
-     ;
-
-    prec4 =
-     {multiplicar} P.prec4 T.multiplicar P.prec5 |
-     {dividir} P.prec4 T.dividir P.prec5 |
-     {prec5} P.prec5
-     ;
-
-    prec5 =
+     {igualdade} [left]:P.expressao [right]:P.expressao |
+     {diferente} [left]:P.expressao [right]:P.expressao |
+     {menor_ig} [left]:P.expressao [right]:P.expressao |
+     {maior_ig} [left]:P.expressao [right]:P.expressao |
+     {menor} [left]:P.expressao [right]:P.expressao |
+     {maior} [left]:P.expressao [right]:P.expressao |
+     {e} [left]:P.expressao [right]:P.expressao |
+     {ou} [left]:P.expressao [right]:P.expressao |
+     {xor} [left]:P.expressao [right]:P.expressao |
+     {not} P.expressao |
+     {inversao} P.expressao |
+     {somar} [left]:P.expressao [right]:P.expressao |
+     {subtrair} [left]:P.expressao [right]:P.expressao |
+     {multiplicar} [left]:P.expressao [right]:P.expressao |
+     {dividir} [left]:P.expressao [right]:P.expressao |
      {valor} P.valor |
-     {variavel} P.variavel |
-     {expressao} T.parenteses_esquerdo P.expressao T.parenteses_direito
+     {variavel} P.variavel
      ;
 
