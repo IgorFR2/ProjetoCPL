@@ -179,8 +179,8 @@ Productions
              | {se_senao} P.comando  T.senao  P.comandos
              | {se_unico} P.comando;
 
-    caso_comandos = {caso} T.caso  P.valor  T.dois_pontos  P.comando
-                  | {casos} T.caso  P.valor  T.dois_pontos  P.comando  P.caso_comandos;
+    caso_comandos = {caso} T.caso  P.valor  T.dois_pontos  P.comandos
+                  | {casos} T.caso  P.valor  T.dois_pontos  P.comandos  P.caso_comandos;
 
     expressao = {igualdade} P.expressao  T.igualdade  P.prec2
               | {diferente} P.expressao  T.diferente  P.prec2
