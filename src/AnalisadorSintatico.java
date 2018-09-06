@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PushbackReader;
 
-public class Sintatico {
+public class AnalisadorSintatico {
   public static void main(String[] args) throws IOException, ParserException, LexerException {
     ComentarioAninhado lexer =
         new ComentarioAninhado(new PushbackReader(new FileReader(args[0]), 1024));
