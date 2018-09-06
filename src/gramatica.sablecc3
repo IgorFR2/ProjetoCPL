@@ -142,7 +142,6 @@ Ignored Tokens
 
 
 Productions
-    inicio = {programa} P.programa;
     programa = {corpo} T.programa  T.id  T.inicio  P.declaracoes  P.comando*  T.fim;
 
     declaracoes = {declaracao} P.declaracao  P.declaracoes

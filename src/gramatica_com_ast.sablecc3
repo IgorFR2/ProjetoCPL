@@ -286,80 +286,87 @@ Productions
     expressao
          {-> P.expressao  } =
 
-     {termo} P.termo
-         {-> New expressao.termo (P.termo  )  }   |
+     {igualdade} P.expressao T.igualdade P.prec2
+         {-> New expressao.igualdade (P.expressao , T.igualdade , P.prec2  )  }   |
 
-     {somar} P.expressao T.somar P.termo
-         {-> New expressao.somar (P.expressao , P.termo  )  }   |
+     {diferente} P.expressao T.diferente P.prec2
+         {-> New expressao.diferente (P.expressao , T.diferente , P.prec2  )  }   |
 
-     {subtrair} P.expressao T.subtrair P.termo
-         {-> New expressao.subtrair (P.expressao , P.termo  )  }   |
+     {menor_ig} P.expressao T.menor_igual P.prec2
+         {-> New expressao.menor_ig (P.expressao , T.menor_igual , P.prec2  )  }   |
 
-     {exp_logica} P.expressao P.exp_logica
-         {-> New expressao.exp_logica (P.expressao , P.exp_logica  )  }
+     {maior_ig} P.expressao T.maior_igual P.prec2
+         {-> New expressao.maior_ig (P.expressao , T.maior_igual , P.prec2  )  }   |
+
+     {menor} P.expressao T.menor P.prec2
+         {-> New expressao.menor (P.expressao , T.menor , P.prec2  )  }   |
+
+     {maior} P.expressao T.maior P.prec2
+         {-> New expressao.maior (P.expressao , T.maior , P.prec2  )  }   |
+
+     {e} P.expressao T.e P.prec2
+         {-> New expressao.e (P.expressao , T.e , P.prec2  )  }   |
+
+     {ou} P.expressao T.ou P.prec2
+         {-> New expressao.ou (P.expressao , T.ou , P.prec2  )  }   |
+
+     {xor} P.expressao T.xor P.prec2
+         {-> New expressao.xor (P.expressao , T.xor , P.prec2  )  }   |
+
+     {not} P.expressao T.nao P.prec2
+         {-> New expressao.not (P.expressao , T.nao , P.prec2  )  }   |
+
+     {prec2} P.prec2
+         {-> New expressao.prec2 (P.prec2  )  }
      ;
 
-    termo
-         {-> P.termo  } =
+    prec2
+         {-> P.prec2  } =
 
-     {fator} P.fator
-         {-> New termo.fator (P.fator  )  }   |
+     {inversao} T.subtrair P.prec3
+         {-> New prec2.inversao (T.subtrair , P.prec3  )  }   |
 
-     {multiplicar} P.termo T.multiplicar P.fator
-         {-> New termo.multiplicar (P.termo , P.fator  )  }   |
-
-     {dividir} P.termo T.dividir P.fator
-         {-> New termo.dividir (P.termo , P.fator  )  }
+     {prec3} prec3
+         {-> New prec2.prec3 (prec3  )  }
      ;
 
-    fator
-         {-> P.fator  } =
+    prec3
+         {-> P.prec3  } =
+
+     {somar} P.prec3 T.somar P.prec4
+         {-> New prec3.somar (P.prec3 , T.somar , P.prec4  )  }   |
+
+     {subtrair} P.prec3 T.subtrair P.prec4
+         {-> New prec3.subtrair (P.prec3 , T.subtrair , P.prec4  )  }   |
+
+     {prec4} P.prec4
+         {-> New prec3.prec4 (P.prec4  )  }
+     ;
+
+    prec4
+         {-> P.prec4  } =
+
+     {multiplicar} P.prec4 T.multiplicar P.prec5
+         {-> New prec4.multiplicar (P.prec4 , T.multiplicar , P.prec5  )  }   |
+
+     {dividir} P.prec4 T.dividir P.prec5
+         {-> New prec4.dividir (P.prec4 , T.dividir , P.prec5  )  }   |
+
+     {prec5} P.prec5
+         {-> New prec4.prec5 (P.prec5  )  }
+     ;
+
+    prec5
+         {-> P.prec5  } =
 
      {valor} P.valor
-         {-> New fator.valor (P.valor  )  }   |
+         {-> New prec5.valor (P.valor  )  }   |
 
      {variavel} P.variavel
-         {-> New fator.variavel (P.variavel  )  }   |
+         {-> New prec5.variavel (P.variavel  )  }   |
 
      {expressao} T.parenteses_esquerdo P.expressao T.parenteses_direito
-         {-> New fator.expressao (P.expressao  )  }
-     ;
-
-    exp_logica
-         {-> P.exp_logica  } =
-
-     {igualdade} T.igualdade P.exp_logica
-         {-> New exp_logica.igualdade (P.exp_logica  )  }   |
-
-     {diferente} T.diferente P.exp_logica
-         {-> New exp_logica.diferente (P.exp_logica  )  }   |
-
-     {menor_ig} T.menor_igual P.exp_logica
-         {-> New exp_logica.menor_ig (P.exp_logica  )  }   |
-
-     {maior_ig} T.maior_igual P.exp_logica
-         {-> New exp_logica.maior_ig (P.exp_logica  )  }   |
-
-     {menor} T.menor P.exp_logica
-         {-> New exp_logica.menor (P.exp_logica  )  }   |
-
-     {maior} T.maior P.exp_logica
-         {-> New exp_logica.maior (P.exp_logica  )  }   |
-
-     {e} T.e P.exp_logica
-         {-> New exp_logica.e (P.exp_logica  )  }   |
-
-     {ou} T.ou P.exp_logica
-         {-> New exp_logica.ou (P.exp_logica  )  }   |
-
-     {xor} T.xor P.exp_logica
-         {-> New exp_logica.xor (P.exp_logica  )  }   |
-
-     {not} T.nao P.fator
-         {-> New exp_logica.not (P.fator  )  }   |
-
-     {operador_logico} P.fator
-         {-> New exp_logica.operador_logico (P.fator  )  }
+         {-> New prec5.expressao (T.parenteses_esquerdo , P.expressao , T.parenteses_direito  )  }
      ;
 
     cmd
@@ -433,35 +440,39 @@ Abstract Syntax Tree
      ;
 
     expressao =
-     {termo} P.termo |
-     {somar} P.expressao P.termo |
-     {subtrair} P.expressao P.termo |
-     {exp_logica} P.expressao P.exp_logica
+     {igualdade} P.expressao T.igualdade P.prec2 |
+     {diferente} P.expressao T.diferente P.prec2 |
+     {menor_ig} P.expressao T.menor_igual P.prec2 |
+     {maior_ig} P.expressao T.maior_igual P.prec2 |
+     {menor} P.expressao T.menor P.prec2 |
+     {maior} P.expressao T.maior P.prec2 |
+     {e} P.expressao T.e P.prec2 |
+     {ou} P.expressao T.ou P.prec2 |
+     {xor} P.expressao T.xor P.prec2 |
+     {not} P.expressao T.nao P.prec2 |
+     {prec2} P.prec2
      ;
 
-    termo =
-     {fator} P.fator |
-     {multiplicar} P.termo P.fator |
-     {dividir} P.termo P.fator
+    prec2 =
+     {inversao} T.subtrair P.prec3 |
+     {prec3} prec3
      ;
 
-    fator =
+    prec3 =
+     {somar} P.prec3 T.somar P.prec4 |
+     {subtrair} P.prec3 T.subtrair P.prec4 |
+     {prec4} P.prec4
+     ;
+
+    prec4 =
+     {multiplicar} P.prec4 T.multiplicar P.prec5 |
+     {dividir} P.prec4 T.dividir P.prec5 |
+     {prec5} P.prec5
+     ;
+
+    prec5 =
      {valor} P.valor |
      {variavel} P.variavel |
-     {expressao} P.expressao
-     ;
-
-    exp_logica =
-     {igualdade} P.exp_logica |
-     {diferente} P.exp_logica |
-     {menor_ig} P.exp_logica |
-     {maior_ig} P.exp_logica |
-     {menor} P.exp_logica |
-     {maior} P.exp_logica |
-     {e} P.exp_logica |
-     {ou} P.exp_logica |
-     {xor} P.exp_logica |
-     {not} P.fator |
-     {operador_logico} P.fator
+     {expressao} T.parenteses_esquerdo P.expressao T.parenteses_direito
      ;
 
