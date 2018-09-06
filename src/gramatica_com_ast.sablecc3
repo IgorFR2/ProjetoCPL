@@ -287,86 +287,86 @@ Productions
          {-> P.expressao  } =
 
      {igualdade} P.expressao T.igualdade P.prec2
-         {-> New expressao.igualdade (P.expressao , T.igualdade , P.prec2  )  }   |
+         {-> New expressao.igualdade (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {diferente} P.expressao T.diferente P.prec2
-         {-> New expressao.diferente (P.expressao , T.diferente , P.prec2  )  }   |
+         {-> New expressao.diferente (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {menor_ig} P.expressao T.menor_igual P.prec2
-         {-> New expressao.menor_ig (P.expressao , T.menor_igual , P.prec2  )  }   |
+         {-> New expressao.menor_ig (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {maior_ig} P.expressao T.maior_igual P.prec2
-         {-> New expressao.maior_ig (P.expressao , T.maior_igual , P.prec2  )  }   |
+         {-> New expressao.maior_ig (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {menor} P.expressao T.menor P.prec2
-         {-> New expressao.menor (P.expressao , T.menor , P.prec2  )  }   |
+         {-> New expressao.menor (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {maior} P.expressao T.maior P.prec2
-         {-> New expressao.maior (P.expressao , T.maior , P.prec2  )  }   |
+         {-> New expressao.maior (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {e} P.expressao T.e P.prec2
-         {-> New expressao.e (P.expressao , T.e , P.prec2  )  }   |
+         {-> New expressao.e (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {ou} P.expressao T.ou P.prec2
-         {-> New expressao.ou (P.expressao , T.ou , P.prec2  )  }   |
+         {-> New expressao.ou (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {xor} P.expressao T.xor P.prec2
-         {-> New expressao.xor (P.expressao , T.xor , P.prec2  )  }   |
+         {-> New expressao.xor (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {not} P.expressao T.nao P.prec2
-         {-> New expressao.not (P.expressao , T.nao , P.prec2  )  }   |
+         {-> New expressao.not (P.expressao.expressao , P.prec2.expressao  )  }   |
 
      {prec2} P.prec2
-         {-> New expressao.prec2 (P.prec2  )  }
+         {-> P.prec2.expressao  }
      ;
 
     prec2
-         {-> P.prec2  } =
+         {-> P.expressao  } =
 
      {inversao} T.subtrair P.prec3
-         {-> New prec2.inversao (T.subtrair , P.prec3  )  }   |
+         {-> New expressao.inversao (P.prec3.expressao  )  }   |
 
      {prec3} prec3
-         {-> New prec2.prec3 (prec3  )  }
+         {-> P.prec3.expressao  }
      ;
 
     prec3
-         {-> P.prec3  } =
+         {-> P.expressao  } =
 
      {somar} P.prec3 T.somar P.prec4
-         {-> New prec3.somar (P.prec3 , T.somar , P.prec4  )  }   |
+         {-> New expressao.somar (P.prec3.expressao , P.prec4.expressao  )  }   |
 
      {subtrair} P.prec3 T.subtrair P.prec4
-         {-> New prec3.subtrair (P.prec3 , T.subtrair , P.prec4  )  }   |
+         {-> New expressao.subtrair (P.prec3.expressao , P.prec4.expressao  )  }   |
 
      {prec4} P.prec4
-         {-> New prec3.prec4 (P.prec4  )  }
+         {-> P.prec4.expressao  }
      ;
 
     prec4
-         {-> P.prec4  } =
+         {-> P.expressao  } =
 
      {multiplicar} P.prec4 T.multiplicar P.prec5
-         {-> New prec4.multiplicar (P.prec4 , T.multiplicar , P.prec5  )  }   |
+         {-> New expressao.multiplicar (P.prec4.expressao , P.prec5.expressao  )  }   |
 
      {dividir} P.prec4 T.dividir P.prec5
-         {-> New prec4.dividir (P.prec4 , T.dividir , P.prec5  )  }   |
+         {-> New expressao.dividir (P.prec4.expressao , P.prec5.expressao  )  }   |
 
      {prec5} P.prec5
-         {-> New prec4.prec5 (P.prec5  )  }
+         {-> P.prec5.expressao  }
      ;
 
     prec5
-         {-> P.prec5  } =
+         {-> P.expressao  } =
 
      {valor} P.valor
-         {-> New prec5.valor (P.valor  )  }   |
+         {-> New expressao.valor (P.valor  )  }   |
 
      {variavel} P.variavel
-         {-> New prec5.variavel (P.variavel  )  }   |
+         {-> New expressao.variavel (P.variavel  )  }   |
 
      {expressao} T.parenteses_esquerdo P.expressao T.parenteses_direito
-         {-> New prec5.expressao (T.parenteses_esquerdo , P.expressao , T.parenteses_direito  )  }
+         {-> P.expressao.expressao  }
      ;
 
     cmd
@@ -440,39 +440,22 @@ Abstract Syntax Tree
      ;
 
     expressao =
-     {igualdade} P.expressao T.igualdade P.prec2 |
-     {diferente} P.expressao T.diferente P.prec2 |
-     {menor_ig} P.expressao T.menor_igual P.prec2 |
-     {maior_ig} P.expressao T.maior_igual P.prec2 |
-     {menor} P.expressao T.menor P.prec2 |
-     {maior} P.expressao T.maior P.prec2 |
-     {e} P.expressao T.e P.prec2 |
-     {ou} P.expressao T.ou P.prec2 |
-     {xor} P.expressao T.xor P.prec2 |
-     {not} P.expressao T.nao P.prec2 |
-     {prec2} P.prec2
-     ;
-
-    prec2 =
-     {inversao} T.subtrair P.prec3 |
-     {prec3} prec3
-     ;
-
-    prec3 =
-     {somar} P.prec3 T.somar P.prec4 |
-     {subtrair} P.prec3 T.subtrair P.prec4 |
-     {prec4} P.prec4
-     ;
-
-    prec4 =
-     {multiplicar} P.prec4 T.multiplicar P.prec5 |
-     {dividir} P.prec4 T.dividir P.prec5 |
-     {prec5} P.prec5
-     ;
-
-    prec5 =
+     {igualdade} [left]:P.expressao [right]:P.expressao |
+     {diferente} [left]:P.expressao [right]:P.expressao |
+     {menor_ig} [left]:P.expressao [right]:P.expressao |
+     {maior_ig} [left]:P.expressao [right]:P.expressao |
+     {menor} [left]:P.expressao [right]:P.expressao |
+     {maior} [left]:P.expressao [right]:P.expressao |
+     {e} [left]:P.expressao [right]:P.expressao |
+     {ou} [left]:P.expressao [right]:P.expressao |
+     {xor} [left]:P.expressao [right]:P.expressao |
+     {not} [left]:P.expressao [right]:P.expressao |
+     {inversao} P.expressao |
+     {somar} [left]:P.expressao [right]:P.expressao |
+     {subtrair} [left]:P.expressao [right]:P.expressao |
+     {multiplicar} [left]:P.expressao [right]:P.expressao |
+     {dividir} [left]:P.expressao [right]:P.expressao |
      {valor} P.valor |
-     {variavel} P.variavel |
-     {expressao} T.parenteses_esquerdo P.expressao T.parenteses_direito
+     {variavel} P.variavel
      ;
 
