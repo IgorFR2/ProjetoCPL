@@ -37,33 +37,40 @@ public class AnalisadorLexico {
   }
 
   private static boolean isEOF(Token token) {
+    return token.getClass().getSimpleName().equals("EOF");
+  }
+
+  private static boolean isInvalidToken(Token token) {
     String tokenName = token.getClass().getSimpleName();
     return tokenName.equals("TComentarioFimErro") || tokenName.equals("EOF");
   }
 
-  private static boolean isValidToken(Token token) {
-    return isEOF(token);
-  }
-
-  public static void verificarEntrada(String arquivo) throws FileNotFoundException {
+  public static void verificarArquivo(String arquivo) throws FileNotFoundException {
     Token token;
 
     comentarioAninhado lexer =
         new comentarioAninhado(new PushbackReader(new FileReader(arquivo), 1024));
 
-    token = lexer.peek();
-    while (!isEOF(token)) {
-      try {
-        if (isValidToken(token)) {
+    try {
+      token = lexer.next();
+      while (!isEOF(token)) {
+        if (!isInvalidToken(token)) {
           imprimirFormatadoToken(token);
         } else {
           imprimirErro(token);
         }
-
-        lexer.next();
-      } catch (LexerException | IOException e) {
-        e.printStackTrace();
+        token = lexer.next();
       }
+    } catch (LexerException | IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void main(String[] args) {
+    try {
+      verificarArquivo(args[0]);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
     }
   }
 }
