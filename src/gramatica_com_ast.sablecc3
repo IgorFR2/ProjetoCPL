@@ -313,8 +313,8 @@ Productions
      {xor} P.expressao T.xor P.prec2
          {-> New expressao.xor (P.expressao.expressao , P.prec2.expressao  )  }   |
 
-     {not} P.expressao T.nao P.prec2
-         {-> New expressao.not (P.expressao.expressao , P.prec2.expressao  )  }   |
+     {not} T.nao P.prec2
+         {-> New expressao.not (P.prec2.expressao  )  }   |
 
      {prec2} P.prec2
          {-> P.prec2.expressao  }
@@ -439,7 +439,7 @@ Abstract Syntax Tree
      {e} [left]:P.expressao [right]:P.expressao |
      {ou} [left]:P.expressao [right]:P.expressao |
      {xor} [left]:P.expressao [right]:P.expressao |
-     {not} [left]:P.expressao [right]:P.expressao |
+     {not} P.expressao |
      {inversao} P.expressao |
      {somar} [left]:P.expressao [right]:P.expressao |
      {subtrair} [left]:P.expressao [right]:P.expressao |

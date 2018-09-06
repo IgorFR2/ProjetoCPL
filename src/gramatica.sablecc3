@@ -191,7 +191,7 @@ Productions
               | {e}         P.expressao  T.e  P.prec2
               | {ou}        P.expressao  T.ou  P.prec2
               | {xor}       P.expressao  T.xor  P.prec2
-              | {not}       P.expressao  T.nao  P.prec2
+              | {not}       T.nao  P.prec2
               | {prec2}     P.prec2;
 
     prec2 = {inversao} T.subtrair  P.prec3
