@@ -184,6 +184,7 @@ Productions
                   | {casos} T.caso  P.valor  T.dois_pontos  P.comando  P.caso_comandos;
 
     expressao = {termo} P.termo
+              | {inversao} T.subtrair  P.termo
               | {somar} P.expressao  T.somar  P.termo
               | {subtrair} P.expressao  T.subtrair  P.termo;
 
@@ -191,7 +192,7 @@ Productions
           | {multiplicar} P.termo  T.multiplicar  P.exp_logica
           | {dividir} P.termo  T.dividir  P.exp_logica;
 
-    exp_logica = | {fator} P.fator
+    exp_logica = {fator} P.fator
                | {igualdade} P.exp_logica  T.igualdade  P.fator
                | {diferente} P.exp_logica  T.diferente  P.fator
                | {menor_ig}  P.exp_logica  T.menor_igual  P.fator
@@ -205,7 +206,6 @@ Productions
 
     fator = {valor} P.valor
           | {variavel} P.variavel
-          // | {inversao} T.subtrair  P.expressao
           | {expressao} T.parenteses_esquerdo  P.expressao  T.parenteses_direito;
 
 
