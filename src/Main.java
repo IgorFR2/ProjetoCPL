@@ -35,8 +35,8 @@ public class Main {
     if (args.length > 0) {
       try {
         /* Form our AST */
-        comentarioAninhado lexer =
-            new comentarioAninhado(new PushbackReader(new FileReader(args[0]), 1024));
+        ComentarioAninhado lexer =
+            new ComentarioAninhado(new PushbackReader(new FileReader(args[0]), 1024));
 
         while (eof) {
           try {

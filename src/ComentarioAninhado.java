@@ -2,13 +2,13 @@ import compilador.lexer.Lexer;
 import compilador.lexer.LexerException;
 import compilador.node.*;
 
-public class comentarioAninhado extends Lexer {
+public class ComentarioAninhado extends Lexer {
   private int count;
   private TComentario comment;
   private StringBuffer text;
 
   // Definimos o construtor
-  public comentarioAninhado(java.io.PushbackReader in) {
+  public ComentarioAninhado(java.io.PushbackReader in) {
     super(in);
   }
 

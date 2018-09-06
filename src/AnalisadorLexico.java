@@ -48,8 +48,8 @@ public class AnalisadorLexico {
   public static void verificarArquivo(String arquivo) throws FileNotFoundException {
     Token token;
 
-    comentarioAninhado lexer =
-        new comentarioAninhado(new PushbackReader(new FileReader(arquivo), 1024));
+    ComentarioAninhado lexer =
+        new ComentarioAninhado(new PushbackReader(new FileReader(arquivo), 1024));
 
     try {
       token = lexer.next();
