@@ -183,29 +183,31 @@ Productions
     caso_comandos = {caso} T.caso  P.valor  T.dois_pontos  P.comando
                   | {casos} T.caso  P.valor  T.dois_pontos  P.comando  P.caso_comandos;
 
-    expressao = {termo} P.termo
-              | {somar} P.expressao  T.somar  P.termo
-              | {subtrair} P.expressao  T.subtrair  P.termo;
+    expressao = {igualdade} P.expressao  T.igualdade  P.prec2
+              | {diferente} P.expressao  T.diferente  P.prec2
+              | {menor_ig}  P.expressao  T.menor_igual  P.prec2
+              | {maior_ig}  P.expressao  T.maior_igual  P.prec2
+              | {menor}     P.expressao  T.menor  P.prec2
+              | {maior}     P.expressao  T.maior  P.prec2
+              | {e}         P.expressao  T.e  P.prec2
+              | {ou}        P.expressao  T.ou  P.prec2
+              | {xor}       P.expressao  T.xor  P.prec2
+              | {not}       P.expressao  T.nao  P.prec2
+              | {prec2}     P.prec2;
 
-    termo = {exp_logica} P.exp_logica
-          | {multiplicar} P.termo  T.multiplicar  P.exp_logica
-          | {dividir} P.termo  T.dividir  P.exp_logica;
+    prec2 = {inversao} T.subtrair  P.prec3
+          | {prec3} prec3;
 
-    exp_logica = | {fator} P.fator
-               | {igualdade} P.exp_logica  T.igualdade  P.fator
-               | {diferente} P.exp_logica  T.diferente  P.fator
-               | {menor_ig}  P.exp_logica  T.menor_igual  P.fator
-               | {maior_ig}  P.exp_logica  T.maior_igual  P.fator
-               | {menor}     P.exp_logica  T.menor  P.fator
-               | {maior}     P.exp_logica  T.maior  P.fator
-               | {e}         P.exp_logica  T.e  P.fator
-               | {ou}        P.exp_logica  T.ou  P.fator
-               | {xor}       P.exp_logica  T.xor  P.fator
-               | {not}       P.exp_logica  T.nao  P.fator;
+    prec3 = {somar} P.prec3  T.somar  P.prec4
+          | {subtrair} P.prec3  T.subtrair  P.prec4
+          | {prec4} P.prec4;
 
-    fator = {valor} P.valor
+    prec4 = {multiplicar} P.prec4  T.multiplicar  P.prec5
+          | {dividir} P.prec4  T.dividir  P.prec5
+          | {prec5} P.prec5;
+
+    prec5 = {valor} P.valor
           | {variavel} P.variavel
-          // | {inversao} T.subtrair  P.expressao
           | {expressao} T.parenteses_esquerdo  P.expressao  T.parenteses_direito;
 
 
