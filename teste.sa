@@ -1,6 +1,6 @@
 programa primeiro
 inicio
-	inteiro : a , b , c ;
+	inteiro : a , b , c, a ;
 	real : r  ,  s  ,  p;
 	caractere: f, g, h;
 	const a 10;
