@@ -62,7 +62,7 @@ Tokens
     tab                 = ctab;
     enter               = cr | nl | cr nl;
     espaco              = ' ';
-    igual               = '=';
+    //igual               = '=';
     programa            = h_programa;
     inicio              = h_inicio;
     fim                 = 'fim.';
@@ -119,8 +119,8 @@ Tokens
     leia         = 'leia';
     const        = 'const';
     tipos_dados  = tipos_dados;
-    caracter     = '''todos''';
-    //vetor             = tipo col id col_e tamanho col_d semi <= type:id[tam];
+    // caracter     = '''todos''';
+    // vetor             = tipo col id col_e tamanho col_d semi <= type:id[tam];
     vetor               = tipos_dados':'sp? nome'['digito*'];';
     vetor_error         = tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
     vetor_string        = tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
