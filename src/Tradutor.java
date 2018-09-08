@@ -8,9 +8,27 @@ import java.lang.System;
 
 public class Tradutor extends DepthFirstAdapter {
   Hashtable symbol_table = new Hashtable();
-  //Ao que parece a symbol table é onde fica a "memoria" das variaveis
-  //O node ainda não entendi ao certo, mas deve ser as folhas da AST
   
+  /**
+  Programa
+  */
+  public void outACorpoPrograma(ACorpoPrograma node){}
+
+  /**
+  Declaracao
+  */
+  public void outADeclaracao(ADeclaracao node){}
+  public void outAConstanteDeclaracao(AConstanteDeclaracao node){}
+  /**
+  Tipos_Dados
+  */
+  public void outAInteiroTiposDados(AInteiroTiposDados node) {}
+  public void outARealTiposDados(ARealTiposDados node) {}
+  public void outACaractereTiposDados(ACaractereTiposDados node) {}
+
+  /**
+  Variavel
+  */
   public void outANomeVariavel(ANomeVariavel node) {
 	    String parent = node.parent().getClass().getSimpleName();
 	    String key = node.getId().getText();
@@ -30,6 +48,30 @@ public class Tradutor extends DepthFirstAdapter {
 	      }
 	    }
 	  }
+  public void outAVetorVariavel(AVetorVariavel node) {}
+
+  /**
+  Valor
+  */
+  public void outAValCaractereValor(AValCaractereValor node) {}
+  public void outAValInteiroValor(AValInteiroValor node) {}
+  public void outAValRealValor(AValRealValor node) {}
+
+
+  /**
+   * Expressões
+   * */
+  public void outAIgualdadeExpressao(AIgualdadeExpressao node){}
+  public void outADiferenteExpressao(ADiferenteExpressao node){}
+  public void outAMenorIgExpressao(AMenorIgExpressao node){}
+  public void outAMaiorIgExpressao(AMaiorIgExpressao node){}
+  public void outAMenorExpressao(AMenorExpressao node){}
+  public void outAMaiorExpressao(AMaiorExpressao node){}
+  public void outAEExpressao(AEExpressao node){}
+  public void outAOuExpressao(AOuExpressao node){}
+  public void outAXorExpressao(AXorExpressao node){}
+  public void outANotExpressao(ANotExpressao node){}
+  public void outAInversaoExpressao(AInversaoExpressao node){}
   
   public void outASomarExpressao(ASomarExpressao node) {
 	
@@ -47,7 +89,16 @@ public class Tradutor extends DepthFirstAdapter {
 	          System.out.println(e);
 	     }
 	}
-  
+
+  public void outASubtrairExpressao(ASubtrairExpressao node){}
+  public void outAMultiplicarExpressao(AMultiplicarExpressao node){}
+  public void outADividirExpressao(ADividirExpressao node){}
+  public void outAValorExpressao(AValorExpressao node){}
+  public void outAVariavelExpressao(AVariavelExpressao node){}
+
+  /**
+  Comando
+  */
   public void outAAtribuicaoComando(AAtribuicaoComando node) {
 	  String parent = node.parent().getClass().getSimpleName();
 	    String key = node.getVariavel().toString();
@@ -76,4 +127,27 @@ public class Tradutor extends DepthFirstAdapter {
 	        }
 
 	}
+  
+  public void ALeituraComando(ALeituraComando node){}
+  public void AEscritaComando(AEscritaComando node){}
+  public void ASeComando(ASeComando node){}
+  public void AAvalieComando(AAvalieComando node){}
+  public void AEnquantoComando(AEnquantoComando node){}
+  public void ARepitaComando(ARepitaComando node){}
+  public void AParaComando(AParaComando node){}
+  public void AParaSegComando(AParaSegComando node){}
+
+  /**
+  Se_corpo
+  */
+  public void outASeSenaoSeCorpo (ASeSenaoSeCorpo node){}
+  public void outASeUnicoSeCorpo(ASeUnicoSeCorpo node){}
+
+  /**
+  Caso_comandos
+  */
+  public void outACasoCasoComandos (ACasoCasoComandos node){}
+  public void outACasosCasoComandos(ACasosCasoComandos node){}
+  
+  
 }
