@@ -8,8 +8,7 @@ import java.lang.System;
 import java.util.Scanner;
 /**
  * OBSERVAÇÃO IMPORTANTE: Nem todas as classes serão UTEIS! Algumas não possuem alterações necessárias para o desenvolvimento.
- * 						  A própria definição nas outras classes já geram completas (Ex: AValorExpressao, removido no comit de
- * 						  09/09 às 00:32) 
+ * 						  A própria definição nas outras etapas já geram completas 
  * 
  * */
 public class Tradutor extends DepthFirstAdapter {
@@ -36,7 +35,8 @@ public class Tradutor extends DepthFirstAdapter {
   /**
   *	Variavel
   **/
-  //	Não acabado, precisa direcionar segunda parte para quando for uma VARIAVEL em uma EXPRESSAO
+  // Parece OK
+  // Se a Variavel for chamada numa declaração e ela já existir, responda com o erro, se não declare-a.
   public void outANomeVariavel(ANomeVariavel node) {
 	    String parent = node.parent().getClass().getSimpleName();
 	    String key = node.getId().getText();
@@ -58,6 +58,7 @@ public class Tradutor extends DepthFirstAdapter {
 	      }
 	    }
 	  }
+  
   //	Como fazer o Vetor?
   public void outAVetorVariavel(AVetorVariavel node) {}
 
@@ -67,24 +68,190 @@ public class Tradutor extends DepthFirstAdapter {
   public void outAValCaractereValor(AValCaractereValor node) {}
   public void outAValInteiroValor(AValInteiroValor node) {}
   public void outAValRealValor(AValRealValor node) {}
+  
+  // Substituição necessaria apenas apra operações boleanas
+  public void outAValorExpressao(AValorExpressao node) {
+	  	String conteudo = node.getValor().toString().trim();
+	  	if(node.parent().toString().contentEquals(
+	  			"AIgualdadeExpressao"
+	  			+"ADiferenteExpressao"
+	  			+"AEExpressao"
+	  			+"AOuExpressao"
+	  			+"AXorExpressao"
+	  			+"ANotExpressao"
+	  			+"AInversaoExpressao")) {
+		  	AValorExpressao noValor;
+		    TVetorString tokenChar;
+		    if (conteudo.equals("0"))
+		    	tokenChar = new TVetorString("falso");
+		    else	
+		    	tokenChar = new TVetorString("verdadeiro");
+		    AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+		    noValor = new AValorExpressao(valorChar);
+		    node.replaceBy(noValor);
+	  	}
+  }
 
 
   /**
    * Expressões
    **/
-  public void outAIgualdadeExpressao(AIgualdadeExpressao node){}
-  public void outADiferenteExpressao(ADiferenteExpressao node){}
-  public void outAMenorIgExpressao(AMenorIgExpressao node){}
-  public void outAMaiorIgExpressao(AMaiorIgExpressao node){}
-  public void outAMenorExpressao(AMenorExpressao node){}
-  public void outAMaiorExpressao(AMaiorExpressao node){}
-  public void outAEExpressao(AEExpressao node){}
-  public void outAOuExpressao(AOuExpressao node){}
-  public void outAXorExpressao(AXorExpressao node){}
-  public void outANotExpressao(ANotExpressao node){}
-  public void outAInversaoExpressao(AInversaoExpressao node){}
   
-  // 	Bloco OK
+  // Problemas com o token "="
+  public void outAIgualdadeExpressao(AIgualdadeExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getLeft().toString().trim().equals(node.getRight().toString().trim())
+		)
+		  tokenChar = new TVetorString("verdadeiro");
+	  else	
+		  tokenChar = new TVetorString("falso");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+
+  }
+  // Copia do Igual, invertendo apenas o if/else
+  public void outADiferenteExpressao(ADiferenteExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getLeft().toString().trim().equals(node.getRight().toString().trim())
+		)
+		  tokenChar = new TVetorString("falso");
+	  else	
+		  tokenChar = new TVetorString("verdadeiro");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+  // Operação E normal
+  public void outAEExpressao(AEExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getLeft().toString().trim().equals("verdadeiro") & node.getRight().toString().trim().equals("verdadeiro")
+		)
+		  tokenChar = new TVetorString("verdadeiro");
+	  else	
+		  tokenChar = new TVetorString("falso");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+ // Operação OU normal
+  public void outAOuExpressao(AOuExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getLeft().toString().trim().equals("verdadeiro") | node.getRight().toString().trim().equals("verdadeiro")
+		)
+		  tokenChar = new TVetorString("verdadeiro");
+	  else	
+		  tokenChar = new TVetorString("falso");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+  // Igual ao Diferente
+  public void outAXorExpressao(AXorExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getLeft().toString().trim().equals(node.getRight().toString().trim())
+		)
+		  tokenChar = new TVetorString("falso");
+	  else	
+		  tokenChar = new TVetorString("verdadeiro");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+  // Apenas uma inversão
+  public void outANotExpressao(ANotExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getExpressao().toString().trim().equals("falso")
+		)
+		  tokenChar = new TVetorString("verdadeiro");
+	  else	
+		  tokenChar = new TVetorString("falso");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+  // Wtf... Duplicado?
+  public void outAInversaoExpressao(AInversaoExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getExpressao().toString().trim().equals("falso")
+		)
+		  tokenChar = new TVetorString("verdadeiro");
+	  else	
+		  tokenChar = new TVetorString("falso");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+  
+  // Parte em que os valores importam (ou não)
+  public void outAMenorIgExpressao(AMenorIgExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) <= 0 
+		)
+		  tokenChar = new TVetorString("verdadeiro");
+	  else	
+		  tokenChar = new TVetorString("falso");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+  public void outAMaiorIgExpressao(AMaiorIgExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) >= 0 
+		)
+		  tokenChar = new TVetorString("verdadeiro");
+	  else	
+		  tokenChar = new TVetorString("falso");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+  public void outAMenorExpressao(AMenorExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) < 0 
+		)
+		  tokenChar = new TVetorString("verdadeiro");
+	  else	
+		  tokenChar = new TVetorString("falso");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+  public void outAMaiorExpressao(AMaiorExpressao node){
+	  AValorExpressao noValor;
+	  TVetorString tokenChar;
+	  if (
+			  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) > 0 
+		)
+		  tokenChar = new TVetorString("verdadeiro");
+	  else	
+		  tokenChar = new TVetorString("falso");
+	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	  noValor = new AValorExpressao(valorChar);
+	  node.replaceBy(noValor);
+  }
+  
+  // 	Bloco OK: Operações básicas matemáticas ( + - x / )
   public void outASomarExpressao(ASomarExpressao node) {
 	
 	     try {
@@ -219,7 +386,7 @@ public class Tradutor extends DepthFirstAdapter {
   }}
   // 	Fim Bloco
  
-  //	Pendente
+  // Aparentemente OK.
   public void outAVariavelExpressao(AVariavelExpressao node){
 	  String key = node.getVariavel().toString().trim();
 	  AValorExpressao noValor;
@@ -244,9 +411,9 @@ public class Tradutor extends DepthFirstAdapter {
   		// Tipo String
   		else {
   			TVetorString tokenChar = new TVetorString(conteudo);
-		        AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
-		        noValor = new AValorExpressao(valorChar);
-		      	node.replaceBy(noValor);
+	        AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	        noValor = new AValorExpressao(valorChar);
+	      	node.replaceBy(noValor);
   		}
   	} 
   	// Caso não haja a variavel na tabela
@@ -258,7 +425,7 @@ public class Tradutor extends DepthFirstAdapter {
   /**
   *	Comando
   **/
-  //	Corrigir atribuição com variaveis, provavel que seja dependencia
+  //	Aparentemente OK.
   public void outAAtribuicaoComando(AAtribuicaoComando node) {
 	  String key = node.getVariavel().toString().trim();
 	  String value = node.getExpressao().toString();
@@ -275,27 +442,29 @@ public class Tradutor extends DepthFirstAdapter {
         System.out.println("Variavel '"+key+"' não declarada.");
       }
 	}
-  //	Pendente: Arrumar checagem de tipo
-  //	Inicialmente lê uma string, mas mudar para o tipo de dado ou dar erro.
+
+  //	Ok: Lê e armazena no lugar certo.
   public void outALeituraComando(ALeituraComando node){
-	  String value = null;
 	  Scanner leitor = new Scanner(System.in);
-	  //Como escolherei?
+	  String conteudo = "9";
+//	  String conteudo = leitor.nextLine();
+	  
 	  leitor.close();
-	  if (symbol_table.containsKey(node.getVariavel().toString())) {
-		  symbol_table.put(node.getVariavel().toString(), value);
+//	  System.out.println("#$ "+symbol_table.containsKey(node.getVariavel().toString().trim()));
+	  if (symbol_table.containsKey(node.getVariavel().toString().trim())) {
+		  symbol_table.replace(node.getVariavel().toString().trim() , conteudo);
+		  System.out.println("Atribuido valor lido '"+conteudo+"' à variavel '"+node.getVariavel().toString().trim()+"'.");
 	  } 
 	  else {
-		  // Como pegar o tipo da variavel?!
-		  System.out.println("(!) Comando Leitura não implementado totalmente.");
+		  System.out.println("Erro na linha: atribuição não permitida.");
 	  }
   }
   
-  //	Corrigir impressão de valor das variaveis (função dependente)
+  //	Ok: Imprime conteudo de variaveis, valores e strings
   public void outAEscritaComando(AEscritaComando node){
 	  if(node.getExpressao().getClass().getSimpleName().equals("AVariavelExpressao")) {
 		  if (symbol_table.containsKey(node.getExpressao().toString())) {
-			  System.out.println(symbol_table.get(node.getExpressao().toString()));
+			  System.out.println(">>> "+symbol_table.get(node.getExpressao().toString()));
 		  }
 	  }
 	  else {
@@ -303,6 +472,7 @@ public class Tradutor extends DepthFirstAdapter {
 		  System.out.println(">>> "+conteudo);
 	  }
   }
+  
   public void outASeComando(ASeComando node){}
   public void outAAvalieComando(AAvalieComando node){}
   public void outAEnquantoComando(AEnquantoComando node){}
