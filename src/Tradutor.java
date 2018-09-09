@@ -65,9 +65,9 @@ public class Tradutor extends DepthFirstAdapter {
   /**
    *	Valor
    **/
-//  public void outAValCaractereValor(AValCaractereValor node) {}
-//  public void outAValInteiroValor(AValInteiroValor node) {}
-//  public void outAValRealValor(AValRealValor node) {}
+/*  public void outAValCaractereValor(AValCaractereValor node) {}
+  public void outAValInteiroValor(AValInteiroValor node) {}
+  public void outAValRealValor(AValRealValor node) {}*/
   
   /**
    * Expressões
@@ -321,7 +321,7 @@ public class Tradutor extends DepthFirstAdapter {
 	    	  * Verificar se é inteiro ou float
 	    	  * */
 	    	 if(node.getLeft().toString().indexOf(',')<0 &&
-	    		node.getLeft().toString().indexOf(',')<0 ) 
+	    		node.getRight().toString().indexOf(',')<0 ) 
 	    	 {
 	    		 resultado = Integer.toString(
 	    				 Integer.valueOf(node.getLeft().toString().trim()) +
@@ -560,34 +560,28 @@ public class Tradutor extends DepthFirstAdapter {
 		  System.out.println(">>> "+conteudo);
 	  }
   }
-  
-  public void outAEnquantoComando(AEnquantoComando node){
-	  AEnquantoComando next = (AEnquantoComando) node.clone();
-	  System.out.println("EnquantoComando expressao: "+node.getExpressao().toString());
-	  if (node.getExpressao().toString().equals("verdadeiro"))
-		  node.replaceBy(node.parent());
+  //
+  public void outASeComando(ASeComando node){
+
   }
+  
+  public void outAAvalieComando(AAvalieComando node){}
+  public void outAEnquantoComando(AEnquantoComando node){}
   public void outARepitaComando(ARepitaComando node){}
   public void outAParaComando(AParaComando node){}
   public void outAParaSegComando(AParaSegComando node){}
 
-  //	Comando SE
-  public void outASeComando(ASeComando node){
-//	  if(node.getExpressao().toString().trim().equals("verdadeiro")){
-//		  ASeCorpo novo = new ASeCorpo(node, node.getSeCorpo());
-//		  node.replaceBy(node.getSeCorpo());
-//	  } else {
-//		  node.replaceBy(node.getSeCorpo());
-//	  }
-  }
   /**
    * Se_corpo
    **/
-  public void outASeSenaoSeCorpo (ASeSenaoSeCorpo node){}
+  public void outASeSenaoSeCorpo (ASeSenaoSeCorpo node){
+	  
+  }
   public void outASeUnicoSeCorpo(ASeUnicoSeCorpo node){}
-  public void outASeCorpo(ASeCorpo node){}
-  
-  public void outAAvalieComando(AAvalieComando node){}
+  public void outASeCorpo(ASeCorpo node){
+	  
+  }
+
   /**
    *Caso_comandos
    **/
