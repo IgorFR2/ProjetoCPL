@@ -65,39 +65,15 @@ public class Tradutor extends DepthFirstAdapter {
   /**
    *	Valor
    **/
-  public void outAValCaractereValor(AValCaractereValor node) {}
-  public void outAValInteiroValor(AValInteiroValor node) {}
-  public void outAValRealValor(AValRealValor node) {}
+//  public void outAValCaractereValor(AValCaractereValor node) {}
+//  public void outAValInteiroValor(AValInteiroValor node) {}
+//  public void outAValRealValor(AValRealValor node) {}
   
-  // Substituição necessaria apenas apra operações boleanas
-  public void outAValorExpressao(AValorExpressao node) {
-	  	String conteudo = node.getValor().toString().trim();
-	  	if(node.parent().toString().contentEquals(
-	  			"AIgualdadeExpressao"
-	  			+"ADiferenteExpressao"
-	  			+"AEExpressao"
-	  			+"AOuExpressao"
-	  			+"AXorExpressao"
-	  			+"ANotExpressao"
-	  			+"AInversaoExpressao")) {
-		  	AValorExpressao noValor;
-		    TVetorString tokenChar;
-		    if (conteudo.equals("0"))
-		    	tokenChar = new TVetorString("falso");
-		    else	
-		    	tokenChar = new TVetorString("verdadeiro");
-		    AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
-		    noValor = new AValorExpressao(valorChar);
-		    node.replaceBy(noValor);
-	  	}
-  }
-
-
   /**
    * Expressões
    **/
   
-  // Problemas com o token "="
+  // Bloco OK
   public void outAIgualdadeExpressao(AIgualdadeExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
@@ -112,7 +88,6 @@ public class Tradutor extends DepthFirstAdapter {
 	  node.replaceBy(noValor);
 
   }
-  // Copia do Igual, invertendo apenas o if/else
   public void outADiferenteExpressao(ADiferenteExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
@@ -126,7 +101,6 @@ public class Tradutor extends DepthFirstAdapter {
 	  noValor = new AValorExpressao(valorChar);
 	  node.replaceBy(noValor);
   }
-  // Operação E normal
   public void outAEExpressao(AEExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
@@ -140,7 +114,6 @@ public class Tradutor extends DepthFirstAdapter {
 	  noValor = new AValorExpressao(valorChar);
 	  node.replaceBy(noValor);
   }
- // Operação OU normal
   public void outAOuExpressao(AOuExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
@@ -154,7 +127,6 @@ public class Tradutor extends DepthFirstAdapter {
 	  noValor = new AValorExpressao(valorChar);
 	  node.replaceBy(noValor);
   }
-  // Igual ao Diferente
   public void outAXorExpressao(AXorExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
@@ -168,7 +140,6 @@ public class Tradutor extends DepthFirstAdapter {
 	  noValor = new AValorExpressao(valorChar);
 	  node.replaceBy(noValor);
   }
-  // Apenas uma inversão
   public void outANotExpressao(ANotExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
@@ -182,7 +153,6 @@ public class Tradutor extends DepthFirstAdapter {
 	  noValor = new AValorExpressao(valorChar);
 	  node.replaceBy(noValor);
   }
-  // Wtf... Duplicado?
   public void outAInversaoExpressao(AInversaoExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
@@ -196,60 +166,150 @@ public class Tradutor extends DepthFirstAdapter {
 	  noValor = new AValorExpressao(valorChar);
 	  node.replaceBy(noValor);
   }
+  //Fim Bloco
   
-  // Parte em que os valores importam (ou não)
+  // Bloco OK
   public void outAMenorIgExpressao(AMenorIgExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
-	  if (
-			  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) <= 0 
-		)
-		  tokenChar = new TVetorString("verdadeiro");
-	  else	
-		  tokenChar = new TVetorString("falso");
-	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
-	  noValor = new AValorExpressao(valorChar);
-	  node.replaceBy(noValor);
-  }
+	  String esquerda = node.getLeft().toString().trim();
+	  String direita = node.getRight().toString().trim();
+	  double floatE, floatD;
+	  int intE, intD;
+//	  Se ambos forem números (Int Real | Real Real | Int Int)
+	  if  (esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		&& esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		){
+ 	    	if(esquerda.indexOf(',')>=0 | direita.indexOf(',')>=0  ) {
+ 	    		floatE = Double.valueOf(esquerda.replace(',', '.'));
+ 	    		floatD = Double.valueOf(direita.replace(',', '.'));
+ 	    		tokenChar = new TVetorString(floatE<=floatD?"verdadeiro":"falso");
+ 	    	} else {
+ 	    		intE = Integer.valueOf(esquerda);
+ 	    		intD = Integer.valueOf(direita);
+ 	    		tokenChar = new TVetorString(intE<=intD?"verdadeiro":"falso");
+ 	    	}
+	  }
+// 	    	 Caso haja String ( Num Str | Str Str)
+	  else {
+ 	    		if (
+ 	    				  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) <= 0 
+ 	    			)
+ 	    			  tokenChar = new TVetorString("verdadeiro");
+ 	    		  else	
+ 	    			  tokenChar = new TVetorString("falso");
+ 	    
+ 	    		AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+ 	    		noValor = new AValorExpressao(valorChar);
+ 	    		node.replaceBy(noValor);
+ 	    	}
+}
   public void outAMaiorIgExpressao(AMaiorIgExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
-	  if (
-			  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) >= 0 
-		)
-		  tokenChar = new TVetorString("verdadeiro");
-	  else	
-		  tokenChar = new TVetorString("falso");
-	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
-	  noValor = new AValorExpressao(valorChar);
-	  node.replaceBy(noValor);
+	  String esquerda = node.getLeft().toString().trim();
+	  String direita = node.getRight().toString().trim();
+	  double floatE, floatD;
+	  int intE, intD;
+//	  Se ambos forem números (Int Real | Real Real | Int Int)
+	  if  (esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		&& esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		){
+ 	    	if(esquerda.indexOf(',')>=0 | direita.indexOf(',')>=0  ) {
+ 	    		floatE = Double.valueOf(esquerda.replace(',', '.'));
+ 	    		floatD = Double.valueOf(direita.replace(',', '.'));
+ 	    		tokenChar = new TVetorString(floatE>=floatD?"verdadeiro":"falso");
+ 	    	} else {
+ 	    		intE = Integer.valueOf(esquerda);
+ 	    		intD = Integer.valueOf(direita);
+ 	    		tokenChar = new TVetorString(intE>=intD?"verdadeiro":"falso");
+ 	    	}
+	  }
+// 	    	 Caso haja String ( Num Str | Str Str)
+	  else {
+ 	    		if (
+ 	    				  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) >= 0 
+ 	    			)
+ 	    			  tokenChar = new TVetorString("verdadeiro");
+ 	    		  else	
+ 	    			  tokenChar = new TVetorString("falso");
+ 	    
+ 	    		AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+ 	    		noValor = new AValorExpressao(valorChar);
+ 	    		node.replaceBy(noValor);
+ 	    	}
   }
   public void outAMenorExpressao(AMenorExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
-	  if (
-			  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) < 0 
-		)
-		  tokenChar = new TVetorString("verdadeiro");
-	  else	
-		  tokenChar = new TVetorString("falso");
-	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
-	  noValor = new AValorExpressao(valorChar);
-	  node.replaceBy(noValor);
+	  String esquerda = node.getLeft().toString().trim();
+	  String direita = node.getRight().toString().trim();
+	  double floatE, floatD;
+	  int intE, intD;
+//	  Se ambos forem números (Int Real | Real Real | Int Int)
+	  if  (esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		&& esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		){
+ 	    	if(esquerda.indexOf(',')>=0 | direita.indexOf(',')>=0  ) {
+ 	    		floatE = Double.valueOf(esquerda.replace(',', '.'));
+ 	    		floatD = Double.valueOf(direita.replace(',', '.'));
+ 	    		tokenChar = new TVetorString(floatE<floatD?"verdadeiro":"falso");
+ 	    	} else {
+ 	    		intE = Integer.valueOf(esquerda);
+ 	    		intD = Integer.valueOf(direita);
+ 	    		tokenChar = new TVetorString(intE<intD?"verdadeiro":"falso");
+ 	    	}
+	  }
+// 	    	 Caso haja String ( Num Str | Str Str)
+	  else {
+ 	    		if (
+ 	    				  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) < 0 
+ 	    			)
+ 	    			  tokenChar = new TVetorString("verdadeiro");
+ 	    		  else	
+ 	    			  tokenChar = new TVetorString("falso");
+ 	    
+ 	    		AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+ 	    		noValor = new AValorExpressao(valorChar);
+ 	    		node.replaceBy(noValor);
+ 	    	}
   }
   public void outAMaiorExpressao(AMaiorExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
-	  if (
-			  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) > 0 
-		)
-		  tokenChar = new TVetorString("verdadeiro");
-	  else	
-		  tokenChar = new TVetorString("falso");
-	  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
-	  noValor = new AValorExpressao(valorChar);
-	  node.replaceBy(noValor);
+	  String esquerda = node.getLeft().toString().trim();
+	  String direita = node.getRight().toString().trim();
+	  double floatE, floatD;
+	  int intE, intD;
+//	  Se ambos forem números (Int Real | Real Real | Int Int)
+	  if  (esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		&& esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		){
+ 	    	if(esquerda.indexOf(',')>=0 | direita.indexOf(',')>=0  ) {
+ 	    		floatE = Double.valueOf(esquerda.replace(',', '.'));
+ 	    		floatD = Double.valueOf(direita.replace(',', '.'));
+ 	    		tokenChar = new TVetorString(floatE>floatD?"verdadeiro":"falso");
+ 	    	} else {
+ 	    		intE = Integer.valueOf(esquerda);
+ 	    		intD = Integer.valueOf(direita);
+ 	    		tokenChar = new TVetorString(intE>intD?"verdadeiro":"falso");
+ 	    	}
+	  }
+// 	    	 Caso haja String ( Num Str | Str Str)
+	  else {
+ 	    		if (
+ 	    				  node.getLeft().toString().trim().compareTo(node.getRight().toString().trim()) > 0 
+ 	    			)
+ 	    			  tokenChar = new TVetorString("verdadeiro");
+ 	    		  else	
+ 	    			  tokenChar = new TVetorString("falso");
+ 	    
+ 	    		AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+ 	    		noValor = new AValorExpressao(valorChar);
+ 	    		node.replaceBy(noValor);
+ 	    	}
   }
+  // Fim Bloco
   
   // 	Bloco OK: Operações básicas matemáticas ( + - x / )
   public void outASomarExpressao(ASomarExpressao node) {
@@ -260,7 +320,9 @@ public class Tradutor extends DepthFirstAdapter {
 	    	 /*
 	    	  * Verificar se é inteiro ou float
 	    	  * */
-	    	 if(node.getLeft().toString().indexOf(',')>=0) {
+	    	 if(node.getLeft().toString().indexOf(',')<0 &&
+	    		node.getLeft().toString().indexOf(',')<0 ) 
+	    	 {
 	    		 resultado = Integer.toString(
 	    				 Integer.valueOf(node.getLeft().toString().trim()) +
 	    				 Integer.valueOf(node.getRight().toString().trim())
@@ -293,7 +355,9 @@ public class Tradutor extends DepthFirstAdapter {
 	    	 /*
 	    	  * Verificar se é inteiro ou float
 	    	  * */
-	    	 if(node.getLeft().toString().indexOf(',')>=0) {
+	    	 if(node.getLeft().toString().indexOf(',')<0 &&
+	 	    		node.getLeft().toString().indexOf(',')<0 ) 
+	 	    	 {
 	    		 resultado = Integer.toString(
 	    				 Integer.valueOf(node.getLeft().toString().trim()) -
 	    				 Integer.valueOf(node.getRight().toString().trim())
@@ -304,7 +368,7 @@ public class Tradutor extends DepthFirstAdapter {
 	    	 } else {
 	    		 
 	    		 resultado = Double.toString(
-	    				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) +
+	    				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) -
 	    				 Double.valueOf(node.getRight().toString().trim().replace(',', '.'))
 	    				 ).replace('.', ',');
 	    		 TNumReal tokenInteiro = new TNumReal(resultado);
@@ -326,7 +390,9 @@ public class Tradutor extends DepthFirstAdapter {
 	    	 /*
 	    	  * Verificar se é inteiro ou float
 	    	  * */
-	    	 if(node.getLeft().toString().indexOf(',')>=0) {
+	    	 if(node.getLeft().toString().indexOf(',')<0 &&
+	 	    		node.getLeft().toString().indexOf(',')<0 ) 
+	 	    	 {
 	    		 resultado = Integer.toString(
 	    				 Integer.valueOf(node.getLeft().toString().trim()) * 
 	    				 Integer.valueOf(node.getRight().toString().trim())
@@ -337,7 +403,7 @@ public class Tradutor extends DepthFirstAdapter {
 	    	 } else {
 	    		 
 	    		 resultado = Double.toString(
-	    				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) +
+	    				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) *
 	    				 Double.valueOf(node.getRight().toString().trim().replace(',', '.'))
 	    				 ).replace('.', ',');
 	    		 TNumReal tokenInteiro = new TNumReal(resultado);
@@ -359,7 +425,9 @@ public class Tradutor extends DepthFirstAdapter {
 	 	 /*
 	 	  * Verificar se é inteiro ou float
 	 	  * */
-	 	 if(node.getLeft().toString().indexOf(',')>=0) {
+	 	if(node.getLeft().toString().indexOf(',')<0 &&
+	    		node.getLeft().toString().indexOf(',')<0 ) 
+	    	 {
 	 		 resultado = Integer.toString(
 	 				 Integer.valueOf(node.getLeft().toString().trim()) /
 	 				 Integer.valueOf(node.getRight().toString().trim())
@@ -370,7 +438,7 @@ public class Tradutor extends DepthFirstAdapter {
 	 	 } else {
 	 		 
 	 		 resultado = Double.toString(
-	 				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) +
+	 				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) /
 	 				 Double.valueOf(node.getRight().toString().trim().replace(',', '.'))
 	 				 ).replace('.', ',');
 	 		 TNumReal tokenInteiro = new TNumReal(resultado);
@@ -421,6 +489,28 @@ public class Tradutor extends DepthFirstAdapter {
   		System.out.println("Erro: Variavel '"+key+"' não existe na tabela.");
   	}
   }
+  // Substituição necessaria apenas apra operações boleanas
+  public void outAValorExpressao(AValorExpressao node) {
+	  if(node.parent().toString().contentEquals(
+			  "AIgualdadeExpressao"
+					  +"ADiferenteExpressao"
+					  +"AEExpressao"
+					  +"AOuExpressao"
+					  +"AXorExpressao"
+					  +"ANotExpressao"
+					  +"AInversaoExpressao")) {
+		  String conteudo = node.getValor().toString().trim();
+		  AValorExpressao noValor;
+		  TVetorString tokenChar;
+		  if (conteudo.equals("0"))
+			  tokenChar = new TVetorString("falso");
+		  else	
+			  tokenChar = new TVetorString("verdadeiro");
+		  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+		  noValor = new AValorExpressao(valorChar);
+		  node.replaceBy(noValor);
+	  }
+  }
 
   /**
   *	Comando
@@ -442,7 +532,6 @@ public class Tradutor extends DepthFirstAdapter {
         System.out.println("Variavel '"+key+"' não declarada.");
       }
 	}
-
   //	Ok: Lê e armazena no lugar certo.
   public void outALeituraComando(ALeituraComando node){
 	  Scanner leitor = new Scanner(System.in);
@@ -459,7 +548,6 @@ public class Tradutor extends DepthFirstAdapter {
 		  System.out.println("Erro na linha: atribuição não permitida.");
 	  }
   }
-  
   //	Ok: Imprime conteudo de variaveis, valores e strings
   public void outAEscritaComando(AEscritaComando node){
 	  if(node.getExpressao().getClass().getSimpleName().equals("AVariavelExpressao")) {
@@ -472,8 +560,11 @@ public class Tradutor extends DepthFirstAdapter {
 		  System.out.println(">>> "+conteudo);
 	  }
   }
+  //
+  public void outASeComando(ASeComando node){
+
+  }
   
-  public void outASeComando(ASeComando node){}
   public void outAAvalieComando(AAvalieComando node){}
   public void outAEnquantoComando(AEnquantoComando node){}
   public void outARepitaComando(ARepitaComando node){}
@@ -483,8 +574,13 @@ public class Tradutor extends DepthFirstAdapter {
   /**
    * Se_corpo
    **/
-  public void outASeSenaoSeCorpo (ASeSenaoSeCorpo node){}
+  public void outASeSenaoSeCorpo (ASeSenaoSeCorpo node){
+	  
+  }
   public void outASeUnicoSeCorpo(ASeUnicoSeCorpo node){}
+  public void outASeCorpo(ASeCorpo node){
+	  
+  }
 
   /**
    *Caso_comandos
