@@ -160,8 +160,13 @@ Productions
             | {escrita}  T.escreva  T.parenteses_esquerdo  P.expressao  T.parenteses_direito
                          T.ponto_virgula
             | {se}       T.se  T.parenteses_esquerdo  P.expressao  T.parenteses_direito  T.entao
-                         P.se_corpo  T.fimse  T.ponto_virgula
+                         P.comandos  T.fimse  T.ponto_virgula
+            | {se_senao} T.se  T.parenteses_esquerdo  P.expressao  T.parenteses_direito  T.entao
+                         [se_comandos]:P.comandos  T.senao  [senao_comandos]:P.comandos  T.fimse
+                         T.ponto_virgula
             | {avalie}   T.avalie  T.parenteses_esquerdo  P.expressao  T.parenteses_direito
+                         P.caso_comandos T.fimavalie  T.ponto_virgula
+            | {avalie_senao} T.avalie  T.parenteses_esquerdo  P.expressao  T.parenteses_direito
                          P.caso_comandos  T.senao  P.comandos  T.fimavalie  T.ponto_virgula
             | {enquanto} T.enquanto  T.parenteses_esquerdo  P.expressao  T.parenteses_direito
                          T.faca  P.comandos  T.fimenquanto  T.ponto_virgula
@@ -175,12 +180,10 @@ Productions
 
     comandos = {comando_unitario} P.comando
              | {comandos} P.comando  P.comandos;
-    se_corpo = P.comando  P.se_corpo
-             | {se_senao} P.comando  T.senao  P.comandos
-             | {se_unico} P.comando;
 
-    caso_comandos = {caso} T.caso  P.valor  T.dois_pontos  P.comandos
-                  | {casos} T.caso  P.valor  T.dois_pontos  P.comandos  P.caso_comandos;
+    caso_comandos = {unico} P.caso_comando
+                  | {multiplos} P.caso_comando  P.caso_comandos;
+    caso_comando = T.caso  P.valor  T.dois_pontos  P.comandos;
 
     expressao = {igualdade} P.expressao  T.igualdade  P.prec2
               | {diferente} P.expressao  T.diferente  P.prec2

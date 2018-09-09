@@ -231,11 +231,17 @@ Productions
      {escrita} T.escreva T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula
          {-> New comando.escrita (P.expressao  )  }   |
 
-     {se} T.se T.parenteses_esquerdo P.expressao T.parenteses_direito T.entao P.se_corpo T.fimse T.ponto_virgula
-         {-> New comando.se (P.expressao , P.se_corpo  )  }   |
+     {se} T.se T.parenteses_esquerdo P.expressao T.parenteses_direito T.entao P.comandos T.fimse T.ponto_virgula
+         {-> New comando.se (P.expressao , [P.comandos.comando]  )  }   |
 
-     {avalie} T.avalie T.parenteses_esquerdo P.expressao T.parenteses_direito P.caso_comandos T.senao P.comandos T.fimavalie T.ponto_virgula
-         {-> New comando.avalie (P.expressao , P.caso_comandos , [P.comandos.comando]  )  }   |
+     {se_senao} T.se T.parenteses_esquerdo P.expressao T.parenteses_direito T.entao [se_comandos]: P.comandos T.senao [senao_comandos]: P.comandos T.fimse T.ponto_virgula
+         {-> New comando.se_senao (P.expressao , [se_comandos.comando] , [senao_comandos.comando]  )  }   |
+
+     {avalie} T.avalie T.parenteses_esquerdo P.expressao T.parenteses_direito P.caso_comandos T.fimavalie T.ponto_virgula
+         {-> New comando.avalie (P.expressao , [P.caso_comandos.caso_comando]  )  }   |
+
+     {avalie_senao} T.avalie T.parenteses_esquerdo P.expressao T.parenteses_direito P.caso_comandos T.senao P.comandos T.fimavalie T.ponto_virgula
+         {-> New comando.avalie_senao (P.expressao , [P.caso_comandos.caso_comando] , [P.comandos.comando] )  }   |
 
      {enquanto} T.enquanto T.parenteses_esquerdo P.expressao T.parenteses_direito T.faca P.comandos T.fimenquanto T.ponto_virgula
          {-> New comando.enquanto (P.expressao , [P.comandos.comando]  )  }   |
@@ -260,27 +266,21 @@ Productions
          {-> [P.comando.comando , P.comandos.comando  ]  }
      ;
 
-    se_corpo
-         {-> P.se_corpo  } =
+    caso_comandos
+         {-> P.caso_comando*  } =
 
-     P.comando P.se_corpo
-         {-> New se_corpo (P.comando , P.se_corpo  )  }   |
+     {unico} P.caso_comando
+         {-> [P.caso_comando.caso_comando ]  }   |
 
-     {se_senao} P.comando T.senao P.comandos
-         {-> New se_corpo.se_senao (P.comando , [P.comandos.comando]  )  }   |
-
-     {se_unico} P.comando
-         {-> New se_corpo.se_unico (P.comando  )  }
+     {multiplos} P.caso_comando P.caso_comandos
+         {-> [P.caso_comando.caso_comando , P.caso_comandos.caso_comando  ]  }
      ;
 
-    caso_comandos
-         {-> P.caso_comandos  } =
+    caso_comando
+         {-> P.caso_comando  } =
 
-     {caso} T.caso P.valor T.dois_pontos P.comandos
-         {-> New caso_comandos.caso (P.valor , [P.comandos.comando]  )  }   |
-
-     {casos} T.caso P.valor T.dois_pontos P.comandos P.caso_comandos
-         {-> New caso_comandos.casos (P.valor , [P.comandos.comando] , P.caso_comandos  )  }
+     T.caso P.valor T.dois_pontos P.comandos
+         {-> New caso_comando (P.valor , [P.comandos.comando]  )  }
      ;
 
     expressao
@@ -410,23 +410,18 @@ Abstract Syntax Tree
      {atribuicao} P.variavel P.expressao |
      {leitura} P.variavel |
      {escrita} P.expressao |
-     {se} P.expressao P.se_corpo |
-     {avalie} P.expressao P.caso_comandos P.comando* |
+     {se} P.expressao P.comando+ |
+     {se_senao} P.expressao [se_comandos]: P.comando+ [senao_comandos]: P.comando+ |
+     {avalie} P.expressao P.caso_comando+ |
+     {avalie_senao} P.expressao P.caso_comando+ P.comando+ |
      {enquanto} P.expressao P.comando+ |
      {repita} P.comando+ P.expressao |
      {para} P.variavel [left]: T.num_inteiro [right]: T.num_inteiro P.comando+ |
      {para_seg} P.variavel [left]: T.num_inteiro T.num_inteiro [right]: T.num_inteiro P.comando+
      ;
 
-    se_corpo =
-     P.comando P.se_corpo |
-     {se_senao} P.comando [senao]:P.comando* |
-     {se_unico} P.comando
-     ;
-
-    caso_comandos =
-     {caso} P.valor P.comando+ |
-     {casos} P.valor P.comando+ P.caso_comandos
+    caso_comando =
+     P.valor P.comando+
      ;
 
     expressao =
