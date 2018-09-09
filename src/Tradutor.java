@@ -560,28 +560,34 @@ public class Tradutor extends DepthFirstAdapter {
 		  System.out.println(">>> "+conteudo);
 	  }
   }
-  //
-  public void outASeComando(ASeComando node){
-
-  }
   
-  public void outAAvalieComando(AAvalieComando node){}
-  public void outAEnquantoComando(AEnquantoComando node){}
+  public void outAEnquantoComando(AEnquantoComando node){
+	  AEnquantoComando next = (AEnquantoComando) node.clone();
+	  System.out.println("EnquantoComando expressao: "+node.getExpressao().toString());
+	  if (node.getExpressao().toString().equals("verdadeiro"))
+		  node.replaceBy(node.parent());
+  }
   public void outARepitaComando(ARepitaComando node){}
   public void outAParaComando(AParaComando node){}
   public void outAParaSegComando(AParaSegComando node){}
 
+  //	Comando SE
+  public void outASeComando(ASeComando node){
+//	  if(node.getExpressao().toString().trim().equals("verdadeiro")){
+//		  ASeCorpo novo = new ASeCorpo(node, node.getSeCorpo());
+//		  node.replaceBy(node.getSeCorpo());
+//	  } else {
+//		  node.replaceBy(node.getSeCorpo());
+//	  }
+  }
   /**
    * Se_corpo
    **/
-  public void outASeSenaoSeCorpo (ASeSenaoSeCorpo node){
-	  
-  }
+  public void outASeSenaoSeCorpo (ASeSenaoSeCorpo node){}
   public void outASeUnicoSeCorpo(ASeUnicoSeCorpo node){}
-  public void outASeCorpo(ASeCorpo node){
-	  
-  }
-
+  public void outASeCorpo(ASeCorpo node){}
+  
+  public void outAAvalieComando(AAvalieComando node){}
   /**
    *Caso_comandos
    **/
