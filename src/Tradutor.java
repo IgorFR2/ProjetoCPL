@@ -32,7 +32,7 @@ public class Tradutor extends DepthFirstAdapter {
 	            +"'."
 	            );
 	      } else {
-	        System.out.println("Declarada a variavel "+key+".");
+//	        System.out.println("Declarada a variavel "+key+".");
 	        symbol_table.put(key, key);
 	      }
 	    }
@@ -68,7 +68,7 @@ public class Tradutor extends DepthFirstAdapter {
   	} 
   	// Caso não haja a variavel na tabela
   	else {
-  		System.out.println("Erro: Variavel '"+key+"' não existe na tabela.");
+  		System.out.println("Erro na linha <linha> Variavel '"+key+"' não existe na tabela.");
   	}
   }
   public void outAValorExpressao(AValorExpressao node) {
@@ -368,6 +368,7 @@ public class Tradutor extends DepthFirstAdapter {
 		  }
 		} else {
 			System.out.println("Erro na linha "+"<linha>"+" (Caracteres não podem ser somados).");
+			
 		}
 	}
   public void outASubtrairExpressao(ASubtrairExpressao node){
@@ -501,54 +502,59 @@ public class Tradutor extends DepthFirstAdapter {
 	  }
   //			Comandos base
   public void outAAtribuicaoComando(AAtribuicaoComando node) {
-	  String key = node.getVariavel().toString().trim();
-	  String value = node.getExpressao().toString();
-	  //Tabela comtém o simbolo, agora verificar tipo para atribuir ou não
-      if (symbol_table.containsKey(key)) {
-    	  // Não são tipos iguais, portanto erro
-    	  if(eNumero(symbol_table.get(key).toString())^eNumero(value))
-    		  System.out.println(
-    				  "Erro na linha <linha>. Atribuição não permitida (variável '"
-    				  + key
-    				  +"' é do tipo "
-    				  + eTipo(key)
-    				  + " e '"
-    				  + value
-    				  + " é do tipo "
-    				  + eTipo(value)
-    				  + ")."
-    		  			);
-    	  else {
-    		  if(eTipo(key).equals("real"))
-    		  {
-    			  	 if(value.indexOf(",")<0)
-    			  		 value.concat(",0");
-    		  } 
-    		  if(eTipo(key).equals("inteiro") & eTipo(value).equals("real"))
-    			  System.out.println("Erro na linha <linha>. Atribuição não permitida (variável '"
-    				  + key
-    				  +"' é do tipo "
-    				  + eTipo(key)
-    				  + " e '"
-    				  + value
-    				  + " é do tipo "
-    				  + eTipo(value)
-    				  + ").");
-    		  else { 
-				  symbol_table.replace(key, value);
-		    	  System.out.println(
-		            "Atribuir "
-		            + key
-		            + " com valor "
-		            + value
-		            +"."
-		            );  
-    		  }
-    	  }
-	      
-      } else {
-        System.out.println("Variavel '"+key+"' não declarada.");
-      }
+	  try {
+			  String key = node.getVariavel().toString().trim();
+			  String value = node.getExpressao().toString();
+			  //Tabela comtém o simbolo, agora verificar tipo para atribuir ou não
+		      if (symbol_table.containsKey(key)) {
+		    	  // Não são tipos iguais, portanto erro
+		    	  if(eNumero(symbol_table.get(key).toString())^eNumero(value))
+		    		  System.out.println(
+		    				  "Erro na linha <linha>. Atribuição não permitida (variável '"
+		    				  + key
+		    				  +"' é do tipo "
+		    				  + eTipo(key)
+		    				  + " e '"
+		    				  + value
+		    				  + " é do tipo "
+		    				  + eTipo(value)
+		    				  + ")."
+		    		  			);
+		    	  else {
+		    		  if(eTipo(key).equals("real"))
+		    		  {
+		    			  	 if(value.indexOf(",")<0)
+		    			  		 value.concat(",0");
+		    		  } 
+		    		  if(eTipo(key).equals("inteiro") & eTipo(value).equals("real"))
+		    			  System.out.println("Erro na linha <linha>. Atribuição não permitida (variável '"
+		    				  + key
+		    				  +"' é do tipo "
+		    				  + eTipo(key)
+		    				  + " e '"
+		    				  + value
+		    				  + " é do tipo "
+		    				  + eTipo(value)
+		    				  + ").");
+		    		  else { 
+		    			 
+						  symbol_table.replace(key, value);
+//				    	  System.out.println(
+//				            "Atribuir "
+//				            + key
+//				            + " com valor "
+//				            + value
+//				            +"."
+//				            );  
+		    		  }
+		    	  }
+			      
+		      } else {
+		        System.out.println("Erro na linha <linha>. (Variavel '"+key+"' não declarada).");
+		      }
+	  	} catch (Exception e) {
+//	  		System.out.println("Erro na linha <linha>. Atribuição não permitida.");
+	  	}
 	}
   public void outALeituraComando(ALeituraComando node){
 	  Scanner leitor = new Scanner(System.in);
