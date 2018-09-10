@@ -47,6 +47,8 @@ States
 
 
 Tokens
+    comentario_linear = cmt_linha [todos - nl]*;
+
     // Divisores
     parenteses_esquerdo = '(';
     parenteses_direito  = ')';
@@ -121,14 +123,13 @@ Tokens
     tipos_dados  = tipos_dados;
     // caracter     = '''todos''';
     // vetor             = tipo col id col_e tamanho col_d semi <= type:id[tam];
-    vetor               = tipos_dados':'sp? nome'['digito*'];';
-    vetor_error         = tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
-    vetor_string        = tipo_string':'sp? nome '['digito*'];' | ('''([[[todos-'''] - cr] -nl ])*''');
-    vetor_string_error  = tipo_string':'sp? word '['digito*'];' | ('''([todos-'''])*''');
+    //vetor               = tipos_dados':'sp? nome'['digito*'];';
+    //vetor_error         = tipos_dados':'sp? (word |nome '['digito*']') '['digito*']' ;
+    vetor_string        = ('''([[[todos-'''] - cr] -nl ])*''');
+    vetor_string_error  = ('''([todos-'''])*''');
     id                  = ('_'|letra)(char|'_')*;
 
     // Comentarios
-    comentario_linear = cmt_linha;
     {normal->comentario, comentario} comentario = '/*';
     {comentario} comentario_fim = '*/';
     {comentario} comentario_corpo = [todos -['*' + '/']]*;
@@ -138,7 +139,7 @@ Tokens
 
 
 Ignored Tokens
-    enter, espaco, tab, comentario_fim_erro, comentario;
+    enter, espaco, tab, comentario_fim_erro, comentario, comentario_linear;
 
 
 Productions
@@ -225,8 +226,8 @@ Productions
      {atribuicao} P.variavel T.atribuir P.expressao T.ponto_virgula
          {-> New comando.atribuicao (P.variavel , P.expressao  )  }   |
 
-     {leitura} T.leia T.parenteses_esquerdo P.variavel T.parenteses_direito T.ponto_virgula
-         {-> New comando.leitura (P.variavel  )  }   |
+     {leitura} T.leia T.parenteses_esquerdo P.variaveis T.parenteses_direito T.ponto_virgula
+         {-> New comando.leitura ([P.variaveis.variavel]  )  }   |
 
      {escrita} T.escreva T.parenteses_esquerdo P.expressao T.parenteses_direito T.ponto_virgula
          {-> New comando.escrita (P.expressao  )  }   |
@@ -408,7 +409,7 @@ Abstract Syntax Tree
 
     comando =
      {atribuicao} P.variavel P.expressao |
-     {leitura} P.variavel |
+     {leitura} P.variavel+ |
      {escrita} P.expressao |
      {se} P.expressao P.comando+ |
      {se_senao} P.expressao [se_comandos]: P.comando+ [senao_comandos]: P.comando+ |
