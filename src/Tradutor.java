@@ -1,42 +1,21 @@
 import compilador.analysis.DepthFirstAdapter;
 import compilador.node.*;
-
 import java.util.Hashtable;
 import java.util.LinkedList;
-
 import java.lang.System;
 import java.util.Scanner;
-/**
- * OBSERVAÇÃO IMPORTANTE: Nem todas as classes serão UTEIS! Algumas não possuem alterações necessárias para o desenvolvimento.
- * 						  A própria definição nas outras etapas já geram completas 
- * 
- * */
+
 public class Tradutor extends DepthFirstAdapter {
   Hashtable symbol_table = new Hashtable();
-  
-  /**
-   *	Programa
-   **/
-  public void outACorpoPrograma(ACorpoPrograma node){}
-
-  /**
-   *	Declaracao
-   **/
+  //			Esquecidos
+  public void outACorpoPrograma(ACorpoPrograma node){} 
   public void outADeclaracao(ADeclaracao node){}
   public void outAConstanteDeclaracao(AConstanteDeclaracao node){}
-  
-  /**
-   *	Tipos_Dados
-   **/
   public void outAInteiroTiposDados(AInteiroTiposDados node) {}
   public void outARealTiposDados(ARealTiposDados node) {}
   public void outACaractereTiposDados(ACaractereTiposDados node) {}
-
-  /**
-  *	Variavel
-  **/
-  // Parece OK
-  // Se a Variavel for chamada numa declaração e ela já existir, responda com o erro, se não declare-a.
+  public void outAVetorVariavel(AVetorVariavel node) {}
+  //			Manipulação de dados e valores
   public void outANomeVariavel(ANomeVariavel node) {
 	    String parent = node.parent().getClass().getSimpleName();
 	    String key = node.getId().getText();
@@ -58,22 +37,62 @@ public class Tradutor extends DepthFirstAdapter {
 	      }
 	    }
 	  }
-  
-  //	Como fazer o Vetor?
-  public void outAVetorVariavel(AVetorVariavel node) {}
-
-  /**
-   *	Valor
-   **/
-/*  public void outAValCaractereValor(AValCaractereValor node) {}
-  public void outAValInteiroValor(AValInteiroValor node) {}
-  public void outAValRealValor(AValRealValor node) {}*/
-  
-  /**
-   * Expressões
-   **/
-  
-  // Bloco OK
+  public void outAVariavelExpressao(AVariavelExpressao node){
+	  String key = node.getVariavel().toString().trim();
+	  AValorExpressao noValor;
+  	if (symbol_table.containsKey(key)) {
+  		// Retornar um tipo de nó, mas qual?
+  		// Se houver letras, é uma string. Se não, se houver virgula é real, se não é inteiro.
+  		String conteudo = symbol_table.get(key).toString().trim();
+  			// Tipo numérico
+  		if(conteudo.matches("^[0-9]+[,]{0,1}[0,9]+")){
+	   	    	if(conteudo.indexOf(',')>=0) {
+	   	    		 TNumInteiro tokenInteiro = new TNumInteiro(conteudo);
+	   		    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
+	   		    	 noValor = new AValorExpressao(valorInteiro);
+	   		    	 node.replaceBy(noValor);
+	   	    	 } else {
+	   	    		 TNumReal tokenInteiro = new TNumReal(conteudo);
+	   		    	 AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
+	   		    	 noValor = new AValorExpressao(valorInteiro);
+	   		    	 node.replaceBy(noValor);
+	   	    	 }
+  		} 
+  		// Tipo String
+  		else {
+  			TVetorString tokenChar = new TVetorString(conteudo);
+	        AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+	        noValor = new AValorExpressao(valorChar);
+	      	node.replaceBy(noValor);
+  		}
+  	} 
+  	// Caso não haja a variavel na tabela
+  	else {
+  		System.out.println("Erro: Variavel '"+key+"' não existe na tabela.");
+  	}
+  }
+  public void outAValorExpressao(AValorExpressao node) {
+	  if(node.parent().toString().contentEquals(
+			  "AIgualdadeExpressao"
+					  +"ADiferenteExpressao"
+					  +"AEExpressao"
+					  +"AOuExpressao"
+					  +"AXorExpressao"
+					  +"ANotExpressao"
+					  +"AInversaoExpressao")) {
+		  String conteudo = node.getValor().toString().trim();
+		  AValorExpressao noValor;
+		  TVetorString tokenChar;
+		  if (conteudo.equals("0"))
+			  tokenChar = new TVetorString("falso");
+		  else	
+			  tokenChar = new TVetorString("verdadeiro");
+		  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
+		  noValor = new AValorExpressao(valorChar);
+		  node.replaceBy(noValor);
+	  }
+  }
+  // 			Booleanos
   public void outAIgualdadeExpressao(AIgualdadeExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
@@ -166,9 +185,7 @@ public class Tradutor extends DepthFirstAdapter {
 	  noValor = new AValorExpressao(valorChar);
 	  node.replaceBy(noValor);
   }
-  //Fim Bloco
-  
-  // Bloco OK
+  // 			Logico
   public void outAMenorIgExpressao(AMenorIgExpressao node){
 	  AValorExpressao noValor;
 	  TVetorString tokenChar;
@@ -178,7 +195,7 @@ public class Tradutor extends DepthFirstAdapter {
 	  int intE, intD;
 //	  Se ambos forem números (Int Real | Real Real | Int Int)
 	  if  (esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
-		&& esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		&& direita.matches("^[0-9]+[,]{0,1}[0,9]+")
 		){
  	    	if(esquerda.indexOf(',')>=0 | direita.indexOf(',')>=0  ) {
  	    		floatE = Double.valueOf(esquerda.replace(',', '.'));
@@ -213,7 +230,7 @@ public class Tradutor extends DepthFirstAdapter {
 	  int intE, intD;
 //	  Se ambos forem números (Int Real | Real Real | Int Int)
 	  if  (esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
-		&& esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		&& direita.matches("^[0-9]+[,]{0,1}[0,9]+")
 		){
  	    	if(esquerda.indexOf(',')>=0 | direita.indexOf(',')>=0  ) {
  	    		floatE = Double.valueOf(esquerda.replace(',', '.'));
@@ -248,7 +265,7 @@ public class Tradutor extends DepthFirstAdapter {
 	  int intE, intD;
 //	  Se ambos forem números (Int Real | Real Real | Int Int)
 	  if  (esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
-		&& esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		&& direita.matches("^[0-9]+[,]{0,1}[0,9]+")
 		){
  	    	if(esquerda.indexOf(',')>=0 | direita.indexOf(',')>=0  ) {
  	    		floatE = Double.valueOf(esquerda.replace(',', '.'));
@@ -283,7 +300,7 @@ public class Tradutor extends DepthFirstAdapter {
 	  int intE, intD;
 //	  Se ambos forem números (Int Real | Real Real | Int Int)
 	  if  (esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
-		&& esquerda.matches("^[0-9]+[,]{0,1}[0,9]+")
+		&& direita.matches("^[0-9]+[,]{0,1}[0,9]+")
 		){
  	    	if(esquerda.indexOf(',')>=0 | direita.indexOf(',')>=0  ) {
  	    		floatE = Double.valueOf(esquerda.replace(',', '.'));
@@ -309,237 +326,236 @@ public class Tradutor extends DepthFirstAdapter {
  	    		node.replaceBy(noValor);
  	    	}
   }
-  // Fim Bloco
-  
-  // 	Bloco OK: Operações básicas matemáticas ( + - x / )
+  // 			Matematico
   public void outASomarExpressao(ASomarExpressao node) {
-	
-	     try {
-	    	 String resultado;
-	    	 AValorExpressao noValor;
-	    	 /*
-	    	  * Verificar se é inteiro ou float
-	    	  * */
-	    	 if(node.getLeft().toString().indexOf(',')<0 &&
-	    		node.getRight().toString().indexOf(',')<0 ) 
-	    	 {
-	    		 resultado = Integer.toString(
-	    				 Integer.valueOf(node.getLeft().toString().trim()) +
-	    				 Integer.valueOf(node.getRight().toString().trim())
-	    				 );
-	    		 TNumInteiro tokenInteiro = new TNumInteiro(resultado);
-		    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
-		    	 noValor = new AValorExpressao(valorInteiro);
-	    	 } else {
-	    		 
-	    		 resultado = Double.toString(
-	    				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) +
-	    				 Double.valueOf(node.getRight().toString().trim().replace(',', '.'))
-	    				 ).replace('.', ',');
-	    		 TNumReal tokenInteiro = new TNumReal(resultado);
-		    	 AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
-		    	 noValor = new AValorExpressao(valorInteiro);
-	    	 }
-	    	 
-	    	 node.replaceBy(noValor);
-	    	 
-	     }
-	     catch (Exception e) {
-	          System.out.println(e);
-	     }
+	  String esquerdo = node.getLeft().toString().trim();
+	  String direito =  node.getRight().toString().trim();
+	  if(eNumero(esquerdo) && eNumero(direito))
+	  	{
+			 try {
+		 	 String resultado;
+		 	 AValorExpressao noValor;
+		 	 /*
+		 	  * Verificar se é inteiro ou float
+		 	  * */
+		 	 if(esquerdo.indexOf(',')<0 &&
+		 		direito.indexOf(',')<0 ) 
+		 	 {
+		 		 resultado = Integer.toString(
+		 				 Integer.valueOf(esquerdo) +
+		 				 Integer.valueOf(direito)
+		 				 );
+		 		 TNumInteiro tokenInteiro = new TNumInteiro(resultado);
+			    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
+			    	 noValor = new AValorExpressao(valorInteiro);
+		 	 } else {
+		 		 
+		 		 resultado = Double.toString(
+		 				 Double.valueOf(esquerdo.replace(',', '.')) +
+		 				 Double.valueOf(direito.replace(',', '.'))
+		 				 ).replace('.', ',');
+		 		 TNumReal tokenInteiro = new TNumReal(resultado);
+			     AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
+			     noValor = new AValorExpressao(valorInteiro);
+			     
+		 	 }
+		 	 
+		 	 node.replaceBy(noValor);
+		 	 
+		  }
+		  catch (Exception e) {
+		       System.out.println(e);
+		  }
+		} else {
+			System.out.println("Erro na linha "+"<linha>"+" (Caracteres não podem ser somados).");
+		}
 	}
   public void outASubtrairExpressao(ASubtrairExpressao node){
-	  try {
-	    	 String resultado;
-	    	 AValorExpressao noValor;
-	    	 /*
-	    	  * Verificar se é inteiro ou float
-	    	  * */
-	    	 if(node.getLeft().toString().indexOf(',')<0 &&
-	 	    		node.getLeft().toString().indexOf(',')<0 ) 
-	 	    	 {
-	    		 resultado = Integer.toString(
-	    				 Integer.valueOf(node.getLeft().toString().trim()) -
-	    				 Integer.valueOf(node.getRight().toString().trim())
-	    				 );
-	    		 TNumInteiro tokenInteiro = new TNumInteiro(resultado);
-		    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
-		    	 noValor = new AValorExpressao(valorInteiro);
-	    	 } else {
-	    		 
-	    		 resultado = Double.toString(
-	    				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) -
-	    				 Double.valueOf(node.getRight().toString().trim().replace(',', '.'))
-	    				 ).replace('.', ',');
-	    		 TNumReal tokenInteiro = new TNumReal(resultado);
-		    	 AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
-		    	 noValor = new AValorExpressao(valorInteiro);
-	    	 }
-	    	 
-	    	 node.replaceBy(noValor);
-	    	 
-	     }
-	     catch (Exception e) {
-	          System.out.println(e);
-	     }
+	  String esquerdo = node.getLeft().toString().trim();
+	  String direito =  node.getRight().toString().trim();
+	  if(eNumero(esquerdo) && eNumero(direito))
+	  	{
+			 try {
+		 	 String resultado;
+		 	 AValorExpressao noValor;
+		 	 /*
+		 	  * Verificar se é inteiro ou float
+		 	  * */
+		 	 if(esquerdo.indexOf(',')<0 &&
+		 		direito.indexOf(',')<0 ) 
+		 	 {
+		 		 resultado = Integer.toString(
+		 				 Integer.valueOf(esquerdo) -
+		 				 Integer.valueOf(direito)
+		 				 );
+		 		 TNumInteiro tokenInteiro = new TNumInteiro(resultado);
+			    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
+			    	 noValor = new AValorExpressao(valorInteiro);
+		 	 } else {
+		 		 
+		 		 resultado = Double.toString(
+		 				 Double.valueOf(esquerdo.replace(',', '.')) -
+		 				 Double.valueOf(direito.replace(',', '.'))
+		 				 ).replace('.', ',');
+		 		 TNumReal tokenInteiro = new TNumReal(resultado);
+			     AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
+			     noValor = new AValorExpressao(valorInteiro);
+			     
+		 	 }
+		 	 
+		 	 node.replaceBy(noValor);
+		 	 
+		  }
+		  catch (Exception e) {
+		       System.out.println(e);
+		  }
+		} else {
+			System.out.println("Erro na linha "+"<linha>"+" (Caracteres não podem ser subtraidos).");
+		}
   }
   public void outAMultiplicarExpressao(AMultiplicarExpressao node){
-	  try {
-	    	 String resultado;
-	    	 AValorExpressao noValor;
-	    	 /*
-	    	  * Verificar se é inteiro ou float
-	    	  * */
-	    	 if(node.getLeft().toString().indexOf(',')<0 &&
-	 	    		node.getLeft().toString().indexOf(',')<0 ) 
-	 	    	 {
-	    		 resultado = Integer.toString(
-	    				 Integer.valueOf(node.getLeft().toString().trim()) * 
-	    				 Integer.valueOf(node.getRight().toString().trim())
-	    				 );
-	    		 TNumInteiro tokenInteiro = new TNumInteiro(resultado);
-		    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
-		    	 noValor = new AValorExpressao(valorInteiro);
-	    	 } else {
-	    		 
-	    		 resultado = Double.toString(
-	    				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) *
-	    				 Double.valueOf(node.getRight().toString().trim().replace(',', '.'))
-	    				 ).replace('.', ',');
-	    		 TNumReal tokenInteiro = new TNumReal(resultado);
-		    	 AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
-		    	 noValor = new AValorExpressao(valorInteiro);
-	    	 }
-	    	 
-	    	 node.replaceBy(noValor);
-	    	 
-	     }
-	     catch (Exception e) {
-	          System.out.println(e);
-	     }
+	  String esquerdo = node.getLeft().toString().trim();
+	  String direito =  node.getRight().toString().trim();
+	  if(eNumero(esquerdo) && eNumero(direito))
+	  	{
+			 try {
+		 	 String resultado;
+		 	 AValorExpressao noValor;
+		 	 /*
+		 	  * Verificar se é inteiro ou float
+		 	  * */
+		 	 if(esquerdo.indexOf(',')<0 &&
+		 		direito.indexOf(',')<0 ) 
+		 	 {
+		 		 resultado = Integer.toString(
+		 				 Integer.valueOf(esquerdo) *
+		 				 Integer.valueOf(direito)
+		 				 );
+		 		 TNumInteiro tokenInteiro = new TNumInteiro(resultado);
+			    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
+			    	 noValor = new AValorExpressao(valorInteiro);
+		 	 } else {
+		 		 
+		 		 resultado = Double.toString(
+		 				 Double.valueOf(esquerdo.replace(',', '.')) *
+		 				 Double.valueOf(direito.replace(',', '.'))
+		 				 ).replace('.', ',');
+		 		 TNumReal tokenInteiro = new TNumReal(resultado);
+			     AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
+			     noValor = new AValorExpressao(valorInteiro);
+			     
+		 	 }
+		 	 
+		 	 node.replaceBy(noValor);
+		 	 
+		  }
+		  catch (Exception e) {
+		       System.out.println(e);
+		  }
+		} else {
+			System.out.println("Erro na linha "+"<linha>"+" (Caracteres não podem ser multiplicados).");
+		}
   }
   public void outADividirExpressao(ADividirExpressao node){
-	 try {
-	 	 String resultado;
-	 	 AValorExpressao noValor;
-	 	 /*
-	 	  * Verificar se é inteiro ou float
-	 	  * */
-	 	if(node.getLeft().toString().indexOf(',')<0 &&
-	    		node.getLeft().toString().indexOf(',')<0 ) 
-	    	 {
-	 		 resultado = Integer.toString(
-	 				 Integer.valueOf(node.getLeft().toString().trim()) /
-	 				 Integer.valueOf(node.getRight().toString().trim())
-	 				 );
-	 		 TNumInteiro tokenInteiro = new TNumInteiro(resultado);
-		    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
-		    	 noValor = new AValorExpressao(valorInteiro);
-	 	 } else {
-	 		 
-	 		 resultado = Double.toString(
-	 				 Double.valueOf(node.getLeft().toString().trim().replace(',', '.')) /
-	 				 Double.valueOf(node.getRight().toString().trim().replace(',', '.'))
-	 				 ).replace('.', ',');
-	 		 TNumReal tokenInteiro = new TNumReal(resultado);
-		    	 AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
-		    	 noValor = new AValorExpressao(valorInteiro);
- 	 }
- 	 
- 	 node.replaceBy(noValor);
- 	 
-  }
-  catch (Exception e) {
-       System.out.println(e);
-  }}
-  // 	Fim Bloco
- 
-  // Aparentemente OK.
-  public void outAVariavelExpressao(AVariavelExpressao node){
-	  String key = node.getVariavel().toString().trim();
-	  AValorExpressao noValor;
-  	if (symbol_table.containsKey(key)) {
-  		// Retornar um tipo de nó, mas qual?
-  		// Se houver letras, é uma string. Se não, se houver virgula é real, se não é inteiro.
-  		String conteudo = symbol_table.get(key).toString().trim();
-  			// Tipo numérico
-  		if(conteudo.matches("^[0-9]+[,]{0,1}[0,9]+")){
-	   	    	if(conteudo.indexOf(',')>=0) {
-	   	    		 TNumInteiro tokenInteiro = new TNumInteiro(conteudo);
-	   		    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
-	   		    	 noValor = new AValorExpressao(valorInteiro);
-	   		    	 node.replaceBy(noValor);
-	   	    	 } else {
-	   	    		 TNumReal tokenInteiro = new TNumReal(conteudo);
-	   		    	 AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
-	   		    	 noValor = new AValorExpressao(valorInteiro);
-	   		    	 node.replaceBy(noValor);
-	   	    	 }
-  		} 
-  		// Tipo String
-  		else {
-  			TVetorString tokenChar = new TVetorString(conteudo);
-	        AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
-	        noValor = new AValorExpressao(valorChar);
-	      	node.replaceBy(noValor);
-  		}
-  	} 
-  	// Caso não haja a variavel na tabela
-  	else {
-  		System.out.println("Erro: Variavel '"+key+"' não existe na tabela.");
-  	}
-  }
-  // Substituição necessaria apenas apra operações boleanas
-  public void outAValorExpressao(AValorExpressao node) {
-	  if(node.parent().toString().contentEquals(
-			  "AIgualdadeExpressao"
-					  +"ADiferenteExpressao"
-					  +"AEExpressao"
-					  +"AOuExpressao"
-					  +"AXorExpressao"
-					  +"ANotExpressao"
-					  +"AInversaoExpressao")) {
-		  String conteudo = node.getValor().toString().trim();
-		  AValorExpressao noValor;
-		  TVetorString tokenChar;
-		  if (conteudo.equals("0"))
-			  tokenChar = new TVetorString("falso");
-		  else	
-			  tokenChar = new TVetorString("verdadeiro");
-		  AValCaractereValor valorChar= new AValCaractereValor(tokenChar);
-		  noValor = new AValorExpressao(valorChar);
-		  node.replaceBy(noValor);
+	  String esquerdo = node.getLeft().toString().trim();
+	  String direito =  node.getRight().toString().trim();
+	  if(eNumero(esquerdo) && eNumero(direito))
+	  	{
+			 try {
+		 	 String resultado;
+		 	 AValorExpressao noValor;
+		 	 /*
+		 	  * Verificar se é inteiro ou float
+		 	  * */
+		 	 if(esquerdo.indexOf(',')<0 &&
+		 		direito.indexOf(',')<0 ) 
+		 	 {
+		 		 resultado = Integer.toString(
+		 				 Integer.valueOf(esquerdo) /
+		 				 Integer.valueOf(direito)
+		 				 );
+		 		 TNumInteiro tokenInteiro = new TNumInteiro(resultado);
+			    	 AValInteiroValor valorInteiro = new AValInteiroValor(tokenInteiro);
+			    	 noValor = new AValorExpressao(valorInteiro);
+		 	 } else {
+		 		 
+		 		 resultado = Double.toString(
+		 				 Double.valueOf(esquerdo.replace(',', '.')) /
+		 				 Double.valueOf(direito.replace(',', '.'))
+		 				 ).replace('.', ',');
+		 		 TNumReal tokenInteiro = new TNumReal(resultado);
+			     AValRealValor valorInteiro = new AValRealValor(tokenInteiro);
+			     noValor = new AValorExpressao(valorInteiro);
+			     
+		 	 }
+		 	 
+		 	 node.replaceBy(noValor);
+		 	 
+		  }
+		  catch (Exception e) {
+		       System.out.println(e);
+		  }
+		} else {
+			System.out.println("Erro na linha "+"<linha>"+" (Caracteres não podem ser divididos).");
+		}
 	  }
-  }
-
-  /**
-  *	Comando
-  **/
-  //	Aparentemente OK.
+  //			Comandos base
   public void outAAtribuicaoComando(AAtribuicaoComando node) {
 	  String key = node.getVariavel().toString().trim();
 	  String value = node.getExpressao().toString();
+	  //Tabela comtém o simbolo, agora verificar tipo para atribuir ou não
       if (symbol_table.containsKey(key)) {
-        symbol_table.replace(key, value);
-    	  System.out.println(
-            "Atribuir "
-            + key
-            + " com valor "
-            + value
-            +"."
-            );
+    	  // Não são tipos iguais, portanto erro
+    	  if(eNumero(symbol_table.get(key).toString())^eNumero(value))
+    		  System.out.println(
+    				  "Erro na linha <linha>. Atribuição não permitida (variável '"
+    				  + key
+    				  +"' é do tipo "
+    				  + eTipo(key)
+    				  + " e '"
+    				  + value
+    				  + " é do tipo "
+    				  + eTipo(value)
+    				  + ")."
+    		  			);
+    	  else {
+    		  if(eTipo(key).equals("real"))
+    		  {
+    			  	 if(value.indexOf(",")<0)
+    			  		 value.concat(",0");
+    		  } 
+    		  if(eTipo(key).equals("inteiro") & eTipo(value).equals("real"))
+    			  System.out.println("Erro na linha <linha>. Atribuição não permitida (variável '"
+    				  + key
+    				  +"' é do tipo "
+    				  + eTipo(key)
+    				  + " e '"
+    				  + value
+    				  + " é do tipo "
+    				  + eTipo(value)
+    				  + ").");
+    		  else { 
+				  symbol_table.replace(key, value);
+		    	  System.out.println(
+		            "Atribuir "
+		            + key
+		            + " com valor "
+		            + value
+		            +"."
+		            );  
+    		  }
+    	  }
+	      
       } else {
         System.out.println("Variavel '"+key+"' não declarada.");
       }
 	}
-  //	Ok: Lê e armazena no lugar certo.
   public void outALeituraComando(ALeituraComando node){
 	  Scanner leitor = new Scanner(System.in);
 	  String conteudo = "9";
 //	  String conteudo = leitor.nextLine();
 	  
 	  leitor.close();
-//	  System.out.println("#$ "+symbol_table.containsKey(node.getVariavel().toString().trim()));
 	  if (symbol_table.containsKey(node.getVariavel().toString().trim())) {
 		  symbol_table.replace(node.getVariavel().toString().trim() , conteudo);
 		  System.out.println("Atribuido valor lido '"+conteudo+"' à variavel '"+node.getVariavel().toString().trim()+"'.");
@@ -548,45 +564,40 @@ public class Tradutor extends DepthFirstAdapter {
 		  System.out.println("Erro na linha: atribuição não permitida.");
 	  }
   }
-  //	Ok: Imprime conteudo de variaveis, valores e strings
   public void outAEscritaComando(AEscritaComando node){
 	  if(node.getExpressao().getClass().getSimpleName().equals("AVariavelExpressao")) {
 		  if (symbol_table.containsKey(node.getExpressao().toString())) {
-			  System.out.println(">>> "+symbol_table.get(node.getExpressao().toString()));
+			  System.out.println(symbol_table.get(node.getExpressao().toString()));
 		  }
 	  }
 	  else {
 		  String conteudo = node.getExpressao().toString();
-		  System.out.println(">>> "+conteudo);
+		  System.out.println(conteudo);
 	  }
   }
-  //
-  public void outASeComando(ASeComando node){
-
-  }
-  
-  public void outAAvalieComando(AAvalieComando node){}
+  // 			Repeat Block
   public void outAEnquantoComando(AEnquantoComando node){}
   public void outARepitaComando(ARepitaComando node){}
   public void outAParaComando(AParaComando node){}
   public void outAParaSegComando(AParaSegComando node){}
-
-  /**
-   * Se_corpo
-   **/
-  public void outASeSenaoSeCorpo (ASeSenaoSeCorpo node){
-	  
-  }
+  // 			Dead Block
+  public void outASeComando(ASeComando node){}
+  public void outASeSenaoSeCorpo (ASeSenaoSeCorpo node){}
   public void outASeUnicoSeCorpo(ASeUnicoSeCorpo node){}
-  public void outASeCorpo(ASeCorpo node){
-	  
-  }
-
-  /**
-   *Caso_comandos
-   **/
+  public void outASeCorpo(ASeCorpo node){}
+  public void outAAvalieComando(AAvalieComando node){}
   public void outACasoCasoComandos (ACasoCasoComandos node){}
   public void outACasosCasoComandos(ACasosCasoComandos node){}
-  
-  
+  //			Auxiliares
+  public boolean eNumero(String x) {
+	  return x.matches("[0-9]+[,]?[0-9]*");
+	 }
+  public String eTipo(String x) {
+	  if (eNumero(x)) {
+		  if (x.indexOf(',')>=0)
+			  return "real";
+		  else
+			  return "inteiro";
+	  } else return "caractere";
+  }
 }
